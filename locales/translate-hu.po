@@ -1,0 +1,435 @@
+# Hungarian translations for picpuz package.
+# This file is distributed under the same license as the picpuz package.
+# Attila Gyurman <attila.gyurnam@it-crowd.hu>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: picpuz\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-01 10:54+0100\n"
+"PO-Revision-Date: 2012-01-03 12:23+0100\n"
+"Last-Translator: Attila Gyurman <attila.gyurman@it-crowd.hu>\n"
+"Language-Team: Hungarian <>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: picpuz-2.6.cc:128 picpuz-2.6.cc:207 zfuncs.cc:7101
+msgid "open"
+msgstr "megnyitás"
+
+#: picpuz-2.6.cc:128
+msgid "open new image file"
+msgstr "új kép megnyitása"
+
+#: picpuz-2.6.cc:129
+msgid "set tile size"
+msgstr "darabok méretének beállítása"
+
+#: picpuz-2.6.cc:129 picpuz-2.6.cc:208
+msgid "tile"
+msgstr "darab"
+
+#: picpuz-2.6.cc:130 picpuz-2.6.cc:209
+msgid "mix"
+msgstr "kever"
+
+#: picpuz-2.6.cc:130
+msgid "randomize tiles"
+msgstr "kirakó összekeverése"
+
+#: picpuz-2.6.cc:131 picpuz-2.6.cc:210
+msgid "show"
+msgstr "megmutat"
+
+#: picpuz-2.6.cc:131
+msgid "show image file"
+msgstr "mutasd az eredeti képet"
+
+#: picpuz-2.6.cc:132 picpuz-2.6.cc:389
+msgid "save puzzle to a file"
+msgstr "kirakó mentse"
+
+#: picpuz-2.6.cc:132 picpuz-2.6.cc:211
+msgid "toolbar::save"
+msgstr "eszköztár::mentés"
+
+#: picpuz-2.6.cc:133 picpuz-2.6.cc:212
+msgid "resume"
+msgstr "folytat"
+
+#: picpuz-2.6.cc:133
+msgid "resume saved puzzle"
+msgstr "elmentett kirakó folytatása"
+
+#: picpuz-2.6.cc:134 picpuz-2.6.cc:213
+msgid "do 1"
+msgstr "do 1"
+
+#: picpuz-2.6.cc:134
+msgid "move one tile home"
+msgstr "egy darab helyre mozgatása"
+
+#: picpuz-2.6.cc:135 picpuz-2.6.cc:214
+msgid "do 8"
+msgstr "do 8"
+
+#: picpuz-2.6.cc:135
+msgid "move eight tiles home"
+msgstr ""
+
+#: picpuz-2.6.cc:136
+msgid "change tile border line"
+msgstr "elválasztó keret változtatása"
+
+#: picpuz-2.6.cc:136 picpuz-2.6.cc:215
+msgid "line"
+msgstr "vonal"
+
+#: picpuz-2.6.cc:137 picpuz-2.6.cc:216
+msgid "quit"
+msgstr "kilép"
+
+#: picpuz-2.6.cc:137
+msgid "quit picpuz"
+msgstr "kilépés a picpuzból"
+
+#: picpuz-2.6.cc:138 picpuz-2.6.cc:217
+msgid "help"
+msgstr "segítség"
+
+#: picpuz-2.6.cc:138
+msgid "view help document"
+msgstr "súgó megnyitása"
+
+#: picpuz-2.6.cc:234
+msgid "select image file"
+msgstr "válassz képet"
+
+#: picpuz-2.6.cc:270 zfuncs.cc:6894 zfuncs.cc:6933 zfuncs.cc:7139
+#: zfuncs.cc:7457 zfuncs.cc:8801 zfuncs.cc:8807 zfuncs.cc:8813 zfuncs.cc:8819
+msgid "cancel"
+msgstr "mégsem"
+
+#: picpuz-2.6.cc:270
+msgid "change tile size"
+msgstr "méret megváltoztatása"
+
+#: picpuz-2.6.cc:272
+msgid "new tile size (pixels)"
+msgstr "új méret (képpont)"
+
+#: picpuz-2.6.cc:394 picpuz-2.6.cc:435
+#, c-format
+msgid "cannot open: %s"
+msgstr "Nem lehet megnyitni: %s"
+
+#: picpuz-2.6.cc:430
+msgid "load puzzle from file"
+msgstr "kirakó betöltése fájlból"
+
+#: picpuz-2.6.cc:477
+msgid "saved puzzle file is not valid"
+msgstr "az elmentett kirakó fájl nem valódi"
+
+#: picpuz-2.6.cc:563
+msgid "DISCARD unfinished puzzle?"
+msgstr "abbahagyod a félkész kirakót?"
+
+#: picpuz-2.6.cc:596
+#, c-format
+msgid ""
+"image type not recognized:\n"
+" %s"
+msgstr ""
+"a kép formátuma nem ismert:\n"
+" %s"
+
+#: picpuz-2.6.cc:605
+msgid "image too small, please select another"
+msgstr "túl kicsi a kép, válassz másikat"
+
+#: picpuz-2.6.cc:1046
+#, c-format
+msgid "tiles home: %d/%d"
+msgstr "darabok jó helyen: %d/%d"
+
+#: picpuz-2.6.cc:1047
+msgid "1st tile selected"
+msgstr "első darab kiválasztva"
+
+#: zfuncs.cc:3369
+#, c-format
+msgid "help file not found: %s"
+msgstr "a súgó fájl nem található: %s"
+
+#: zfuncs.cc:3482
+#, c-format
+msgid "error: %s"
+msgstr "hiba: %s"
+
+#: zfuncs.cc:3805 zfuncs.cc:8688
+#, c-format
+msgid "cannot open file %s"
+msgstr "nem lehet megnyitni a következő fájlt: %s"
+
+#: zfuncs.cc:3838
+msgid "save screen to file"
+msgstr "képernyő mentése fájlba"
+
+#: zfuncs.cc:6815
+msgid "No"
+msgstr "Nem"
+
+#: zfuncs.cc:6815
+msgid "Yes"
+msgstr "Igen"
+
+#: zfuncs.cc:7106
+msgid "choose"
+msgstr "választ"
+
+#: zfuncs.cc:7111
+msgid "save"
+msgstr "ment"
+
+#: zfuncs.cc:7117
+msgid "open folder"
+msgstr "mappa megynitása"
+
+#: zfuncs.cc:7122
+msgid "create folder"
+msgstr "új mappa"
+
+#: zfuncs.cc:7128
+msgid "hidden"
+msgstr "rejtett"
+
+#: zfuncs.cc:7132
+msgid "quality"
+msgstr "mindőség"
+
+#: zfuncs.cc:7189
+msgid "JPG quality 0-100"
+msgstr "JPG minőség 0-100"
+
+#: zfuncs.cc:7448
+#, c-format
+msgid "printed image width: %.1f  height: %.1f  cm"
+msgstr ""
+
+#: zfuncs.cc:7457
+msgid "done"
+msgstr "kész"
+
+#: zfuncs.cc:7457 zfuncs.cc:7469
+msgid "margins"
+msgstr ""
+
+#: zfuncs.cc:7465
+msgid "top"
+msgstr "felső"
+
+#: zfuncs.cc:7466
+msgid "bottom"
+msgstr "alsó"
+
+#: zfuncs.cc:7467
+msgid "left"
+msgstr "bal"
+
+#: zfuncs.cc:7468
+msgid "right"
+msgstr "jobb"
+
+#: zfuncs.cc:7475
+msgid "image scale"
+msgstr ""
+
+#: zfuncs.cc:7477
+msgid "percent"
+msgstr ""
+
+#: zfuncs.cc:8575
+msgid ""
+"Initial parameters file created. \n"
+"Inspect and revise if necessary."
+msgstr ""
+"Alapértelmezett konfigurációs fájl elkészült. \n"
+"Ellenőrizd és változtasd, ha szükséges."
+
+#: zfuncs.cc:8591
+msgid "load parameters from a file"
+msgstr "beállítások betöltése fájlból"
+
+#: zfuncs.cc:8660
+msgid "save parameters to a file"
+msgstr "beállítások elmentése fájlba"
+
+#: zfuncs.cc:8799 zfuncs.cc:8805 zfuncs.cc:8811 zfuncs.cc:8817
+msgid "edit parameters"
+msgstr "beállítások szerkesztése"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806
+msgid ""
+"list\n"
+"all"
+msgstr ""
+"listáz\n"
+"mind"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806 zfuncs.cc:8812 zfuncs.cc:8818
+msgid ""
+"load\n"
+"file"
+msgstr ""
+"betölt\n"
+"fájl"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806 zfuncs.cc:8812 zfuncs.cc:8818
+msgid ""
+"save\n"
+"file"
+msgstr ""
+"ment\n"
+"fájl"
+
+#: zfuncs.cc:8801 zfuncs.cc:8813
+msgid ""
+"add\n"
+"new"
+msgstr ""
+"hozzáad\n"
+"új"
+
+#: zfuncs.cc:8801 zfuncs.cc:8807 zfuncs.cc:8813 zfuncs.cc:8819
+msgid "apply"
+msgstr "alkalmaz"
+
+#: zfuncs.cc:8854
+msgid "apply?"
+msgstr "alkalmaz?"
+
+#: zfuncs.cc:8911
+msgid "(new parm name)"
+msgstr "(új paraméter neve)"
+
+#: zfuncs.cc:8911
+msgid "add parameter"
+msgstr "paraméter hozzáadása"
+
+#~ msgid "gallery"
+#~ msgstr "galéria"
+
+#~ msgid "image gallery"
+#~ msgstr "képgaléria"
+
+#~ msgid "prev"
+#~ msgstr "előző"
+
+#~ msgid "previous image file"
+#~ msgstr "előző kép"
+
+#~ msgid "next"
+#~ msgstr "következő"
+
+#~ msgid "next image file"
+#~ msgstr "következő kép"
+
+#~ msgid "move ten tiles home"
+#~ msgstr "tíz darab helyre mozgatása"
+
+#~ msgid "print"
+#~ msgstr "nyomtat"
+
+#~ msgid "printer ID"
+#~ msgstr "nyomtató ID"
+
+#~ msgid "paper format"
+#~ msgstr "papírformátum"
+
+#~ msgid "portrait"
+#~ msgstr "álló"
+
+#~ msgid "landscape"
+#~ msgstr "fekvő"
+
+#~ msgid "margins:"
+#~ msgstr "margók"
+
+#~ msgid "paper format is crazy"
+#~ msgstr "hibás papírformátum"
+
+#~ msgid "bigger"
+#~ msgstr "nagyobb"
+
+#~ msgid "increase thumbnail size"
+#~ msgstr "bélyegkép növelése"
+
+#~ msgid "reduce thumbnail size"
+#~ msgstr "bélyegkép csökkentése"
+
+#~ msgid "smaller"
+#~ msgstr "kisebb"
+
+#~ msgid "parent"
+#~ msgstr "feljebb"
+
+#~ msgid "parent directory"
+#~ msgstr "szülő könyvtár"
+
+#~ msgid "open a file"
+#~ msgstr "fájl megnyitása"
+
+#~ msgid "first page"
+#~ msgstr "első oldal"
+
+#~ msgid "jump to first file"
+#~ msgstr "ugrás az első fájlra"
+
+#~ msgid "prev page"
+#~ msgstr "előző oldal"
+
+#~ msgid "previous page"
+#~ msgstr "előző oldal"
+
+#~ msgid "prev row"
+#~ msgstr "előző sor"
+
+#~ msgid "previous row"
+#~ msgstr "előző sor"
+
+#~ msgid "next row"
+#~ msgstr "következő sor"
+
+#~ msgid "next page"
+#~ msgstr "következő oldal"
+
+#~ msgid "jump to last file"
+#~ msgstr "ugrás az utolsó fájlra"
+
+#~ msgid "last page"
+#~ msgstr "utolsó oldal"
+
+#~ msgid "close"
+#~ msgstr "bezár"
+
+#~ msgid "close image gallery"
+#~ msgstr "képgaléria bezárása"
+
+#~ msgid "select new file"
+#~ msgstr "új fájl kiválasztása"
+
+#~ msgid "Select Files"
+#~ msgstr "Fájlok kiválasztása"
+
+#~ msgid "delete"
+#~ msgstr "töröl"
+
+#~ msgid "insert"
+#~ msgstr "beszúr"
+
+#~ msgid "add all"
+#~ msgstr "összeset hozzáad"

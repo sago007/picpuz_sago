@@ -1,0 +1,410 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# luojie <lililjlj@gmail.com>, 2009, 2010.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: picpuz\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-01 10:54+0100\n"
+"PO-Revision-Date: 2010-05-10 22:31+1000\n"
+"Last-Translator: luojie <lililjlj@gmail.com>\n"
+"Language-Team: Simplified Chinese <lililjlj@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: utf-8\n"
+
+#: picpuz-2.6.cc:128 picpuz-2.6.cc:207 zfuncs.cc:7101
+msgid "open"
+msgstr "打开"
+
+#: picpuz-2.6.cc:128
+msgid "open new image file"
+msgstr "打开图像文件"
+
+#: picpuz-2.6.cc:129
+msgid "set tile size"
+msgstr "设置图块大小"
+
+#: picpuz-2.6.cc:129 picpuz-2.6.cc:208
+msgid "tile"
+msgstr "图块"
+
+#: picpuz-2.6.cc:130 picpuz-2.6.cc:209
+msgid "mix"
+msgstr "混合"
+
+#: picpuz-2.6.cc:130
+msgid "randomize tiles"
+msgstr "随机图块大小"
+
+#: picpuz-2.6.cc:131 picpuz-2.6.cc:210
+msgid "show"
+msgstr "显示"
+
+#: picpuz-2.6.cc:131
+msgid "show image file"
+msgstr "显示图像文件"
+
+#: picpuz-2.6.cc:132 picpuz-2.6.cc:389
+msgid "save puzzle to a file"
+msgstr "保存拼图到文件中"
+
+#: picpuz-2.6.cc:132 picpuz-2.6.cc:211
+msgid "toolbar::save"
+msgstr "保存"
+
+#: picpuz-2.6.cc:133 picpuz-2.6.cc:212
+msgid "resume"
+msgstr "继续"
+
+#: picpuz-2.6.cc:133
+msgid "resume saved puzzle"
+msgstr "继续保存的拼图"
+
+#: picpuz-2.6.cc:134 picpuz-2.6.cc:213
+msgid "do 1"
+msgstr "1个"
+
+#: picpuz-2.6.cc:134
+msgid "move one tile home"
+msgstr "将一个图块移回原处"
+
+#: picpuz-2.6.cc:135 picpuz-2.6.cc:214
+msgid "do 8"
+msgstr "8个"
+
+#: picpuz-2.6.cc:135
+msgid "move eight tiles home"
+msgstr ""
+
+#: picpuz-2.6.cc:136
+msgid "change tile border line"
+msgstr "改变图块边线"
+
+#: picpuz-2.6.cc:136 picpuz-2.6.cc:215
+msgid "line"
+msgstr "线"
+
+#: picpuz-2.6.cc:137 picpuz-2.6.cc:216
+msgid "quit"
+msgstr "退出"
+
+#: picpuz-2.6.cc:137
+msgid "quit picpuz"
+msgstr "退出picpuz"
+
+#: picpuz-2.6.cc:138 picpuz-2.6.cc:217
+msgid "help"
+msgstr "帮助"
+
+#: picpuz-2.6.cc:138
+msgid "view help document"
+msgstr "查看帮助文档"
+
+#: picpuz-2.6.cc:234
+msgid "select image file"
+msgstr "选择图像文件"
+
+#: picpuz-2.6.cc:270 zfuncs.cc:6894 zfuncs.cc:6933 zfuncs.cc:7139
+#: zfuncs.cc:7457 zfuncs.cc:8801 zfuncs.cc:8807 zfuncs.cc:8813 zfuncs.cc:8819
+msgid "cancel"
+msgstr "取消"
+
+#: picpuz-2.6.cc:270
+msgid "change tile size"
+msgstr "改变图块大小"
+
+#: picpuz-2.6.cc:272
+msgid "new tile size (pixels)"
+msgstr "新图块文件（像素数）"
+
+#: picpuz-2.6.cc:394 picpuz-2.6.cc:435
+#, c-format
+msgid "cannot open: %s"
+msgstr "无法打开： %s"
+
+#: picpuz-2.6.cc:430
+msgid "load puzzle from file"
+msgstr "从文件读取拼图"
+
+#: picpuz-2.6.cc:477
+msgid "saved puzzle file is not valid"
+msgstr "保存拼图失败"
+
+#: picpuz-2.6.cc:563
+msgid "DISCARD unfinished puzzle?"
+msgstr "中止游戏吗？"
+
+#: picpuz-2.6.cc:596
+#, c-format
+msgid ""
+"image type not recognized:\n"
+" %s"
+msgstr ""
+"图像文件无法识别：\n"
+" %s"
+
+#: picpuz-2.6.cc:605
+msgid "image too small, please select another"
+msgstr "图像太小，请选择其他的"
+
+#: picpuz-2.6.cc:1046
+#, c-format
+msgid "tiles home: %d/%d"
+msgstr "图块：%d/%d"
+
+#: picpuz-2.6.cc:1047
+msgid "1st tile selected"
+msgstr "已经选择第一个图块"
+
+#: zfuncs.cc:3369
+#, c-format
+msgid "help file not found: %s"
+msgstr "没找到帮助文件: %s"
+
+#: zfuncs.cc:3482
+#, c-format
+msgid "error: %s"
+msgstr "错误： %s"
+
+#: zfuncs.cc:3805 zfuncs.cc:8688
+#, c-format
+msgid "cannot open file %s"
+msgstr "不能打开文件 %s"
+
+#: zfuncs.cc:3838
+msgid "save screen to file"
+msgstr "保存屏幕到文件"
+
+#: zfuncs.cc:6815
+msgid "No"
+msgstr "无"
+
+#: zfuncs.cc:6815
+msgid "Yes"
+msgstr "是"
+
+#: zfuncs.cc:7106
+msgid "choose"
+msgstr "选择\t"
+
+#: zfuncs.cc:7111
+msgid "save"
+msgstr "保存"
+
+#: zfuncs.cc:7117
+msgid "open folder"
+msgstr "打开文件夹"
+
+#: zfuncs.cc:7122
+msgid "create folder"
+msgstr "创造文件夹"
+
+#: zfuncs.cc:7128
+msgid "hidden"
+msgstr "隐藏的"
+
+#: zfuncs.cc:7132
+msgid "quality"
+msgstr "质量"
+
+#: zfuncs.cc:7189
+msgid "JPG quality 0-100"
+msgstr "JPG 质量 0-100"
+
+#: zfuncs.cc:7448
+#, c-format
+msgid "printed image width: %.1f  height: %.1f  cm"
+msgstr ""
+
+#: zfuncs.cc:7457
+msgid "done"
+msgstr "完成"
+
+#: zfuncs.cc:7457 zfuncs.cc:7469
+msgid "margins"
+msgstr ""
+
+#: zfuncs.cc:7465
+msgid "top"
+msgstr ""
+
+#: zfuncs.cc:7466
+msgid "bottom"
+msgstr ""
+
+#: zfuncs.cc:7467
+msgid "left"
+msgstr ""
+
+#: zfuncs.cc:7468
+msgid "right"
+msgstr ""
+
+#: zfuncs.cc:7475
+msgid "image scale"
+msgstr ""
+
+#: zfuncs.cc:7477
+msgid "percent"
+msgstr ""
+
+#: zfuncs.cc:8575
+msgid ""
+"Initial parameters file created. \n"
+"Inspect and revise if necessary."
+msgstr ""
+"初始化参数文件。 \n"
+"如必要，请检查。"
+
+#: zfuncs.cc:8591
+msgid "load parameters from a file"
+msgstr "从一个文件读取参数"
+
+#: zfuncs.cc:8660
+msgid "save parameters to a file"
+msgstr "保存参数到文件"
+
+#: zfuncs.cc:8799 zfuncs.cc:8805 zfuncs.cc:8811 zfuncs.cc:8817
+msgid "edit parameters"
+msgstr "修改参数"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806
+msgid ""
+"list\n"
+"all"
+msgstr ""
+"列表\n"
+"全部"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806 zfuncs.cc:8812 zfuncs.cc:8818
+msgid ""
+"load\n"
+"file"
+msgstr ""
+"读取\n"
+"文件"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806 zfuncs.cc:8812 zfuncs.cc:8818
+msgid ""
+"save\n"
+"file"
+msgstr ""
+"保存\n"
+"文件"
+
+#: zfuncs.cc:8801 zfuncs.cc:8813
+msgid ""
+"add\n"
+"new"
+msgstr ""
+"添加\n"
+"新"
+
+#: zfuncs.cc:8801 zfuncs.cc:8807 zfuncs.cc:8813 zfuncs.cc:8819
+msgid "apply"
+msgstr "应用"
+
+#: zfuncs.cc:8854
+msgid "apply?"
+msgstr "应用？"
+
+#: zfuncs.cc:8911
+msgid "(new parm name)"
+msgstr "(新参数名)"
+
+#: zfuncs.cc:8911
+msgid "add parameter"
+msgstr "添加参数"
+
+#~ msgid "gallery"
+#~ msgstr "浏览"
+
+#~ msgid "image gallery"
+#~ msgstr "图像浏览"
+
+#~ msgid "prev"
+#~ msgstr "前一个"
+
+#~ msgid "previous image file"
+#~ msgstr "之前的图像文件"
+
+#~ msgid "next"
+#~ msgstr "下一个"
+
+#~ msgid "next image file"
+#~ msgstr "下一个图像文件"
+
+#~ msgid "bigger"
+#~ msgstr "放大"
+
+#~ msgid "increase thumbnail size"
+#~ msgstr "提升缩略图尺寸"
+
+#~ msgid "reduce thumbnail size"
+#~ msgstr "减小缩略图尺寸"
+
+#~ msgid "smaller"
+#~ msgstr "缩小"
+
+#~ msgid "parent"
+#~ msgstr "上级"
+
+#~ msgid "parent directory"
+#~ msgstr "上级目录"
+
+#~ msgid "first page"
+#~ msgstr "第一页"
+
+#~ msgid "jump to first file"
+#~ msgstr "跳至第一个文件"
+
+#~ msgid "prev page"
+#~ msgstr "前一页"
+
+#~ msgid "previous page"
+#~ msgstr "前一页"
+
+#~ msgid "prev row"
+#~ msgstr "前一行"
+
+#~ msgid "previous row"
+#~ msgstr "前一行"
+
+#~ msgid "next row"
+#~ msgstr "下一行"
+
+#~ msgid "next page"
+#~ msgstr "下一页"
+
+#~ msgid "jump to last file"
+#~ msgstr "跳至最后一个文件"
+
+#~ msgid "last page"
+#~ msgstr "上一页"
+
+#~ msgid "close"
+#~ msgstr "关闭"
+
+#~ msgid "close image gallery"
+#~ msgstr "关闭图像浏览"
+
+#~ msgid "select new file"
+#~ msgstr "选择新文件"
+
+#~ msgid "Select Files"
+#~ msgstr "选择文件"
+
+#~ msgid "delete"
+#~ msgstr "删除"
+
+#~ msgid "insert"
+#~ msgstr "插入"
+
+#~ msgid "add all"
+#~ msgstr "添加全部"

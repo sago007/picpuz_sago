@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=picpuz
+GenericName=Jigsaw Puzzle
+Comment=Break any image into puzzle tiles, reassemble with the mouse
+Categories=Game;LogicGame
+Type=Application
+Terminal=false
+Exec=/usr/bin/picpuz
+Icon=/usr/share/picpuz/icons/picpuz.png

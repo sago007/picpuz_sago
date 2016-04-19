@@ -1,0 +1,14 @@
+Package: picpuz
+Version: 2.7
+Architecture: amd64
+Section: misc
+Installed-Size: 1128
+Maintainer: Mike Cornelison <kornelix@posteo.de>
+Priority: optional
+Homepage: http://kornelix.net/
+Depends: libc6, binutils
+Description: Mouse-driven jigsaw puzzle. 
+ Use any image. Divide into pieces, randomize, put back together 
+ using the mouse. Save and recover unfinished puzzles.
+
+

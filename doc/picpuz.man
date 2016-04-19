@@ -1,0 +1,22 @@
+.TH PICPUZ 1 2011-05-01 "Linux" "picpuz man page"
+
+.SH NAME
+ picpuz - create a jigsaw puzzle from an image and assemble with the mouse.
+
+.SH SYNOPSIS
+ \fBpicpuz\fR
+
+.SH DESCRIPTION
+ You can take almost any image (jpeg, tiff, png ...) and scramble it into 
+ many pieces (tens to hundreds). You can then reassemble the picture using 
+ the mouse to move the pieces around.
+
+.SH SEE ALSO
+ The online user manual is available using the help toolbar button.
+ This manual explains picpuz operation in great detail.
+
+.SH AUTHORS
+ Written by Michael Cornelison <kornelix@posteo.de>
+ http://kornelix.net
+
+

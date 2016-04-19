@@ -1,0 +1,108 @@
+TRANSLATIONS OF PICPUZ
+
+The instructions here apply to the GUI interface (menus and dialogs).
+For user guide translations, see below.
+
+INTRODUCTION TO TRANSLATION FILES
+
+Translation files for picpuz are located here:
+   /usr/share/picpuz/locales/translate-lc.po.gz
+
+This is the installed translation file for language "lc".
+It may or may not be compressed (.gz ending).
+
+"lc" is a standard 2-character language code, e.g. "de" for German,
+or a combination language and region code formatted "lc_RC", e.g.
+"de_AT" for Austrian German. This code normally corresponds to the
+locale of the computer, as shown by the command: $ echo $LANG
+
+If there is no installed translation file for "lc", you can use the
+dummy translation file for "en" (english) as a template. Replace the
+translations of "english to english" with "english to new-language".
+
+The translation files in /usr/share/picpuz/locales/ are protected
+and cannot be edited unless you have root privileges. It is better
+to copy a translation file to a more convenient location for editing.
+
+The .po file contains the English phrases used by picpuz, with the
+corresponding translations for language "lc" (or "lc_RC"). It can be
+edited with any text editor.
+
+A typical translation in the .po file looks like this:
+   msgid "The file name is: %s \n"
+   msgstr "Der Dateiname ist: %s \n"
+
+"msgid" is an English text needing a translation. "msgstr" is the
+translation (German in this case). The special codes "%s" and "\n"
+are for inserted data and formatting. In the translation, these
+codes must match with the English in both type and sequence.
+
+A missing translation looks like this:
+   msgid "The file name is: %s \n"
+   msgstr ""
+
+TO REVISE A TRANSLATION
+
+   1. Edit translate-lc.po to add or update translation strings.
+   2. Replace the original file in /usr/share/picpuz/locales/.
+   3. Option: compile the .po file to check for errors:
+      $ msgfmt -v --check-format -o /dev/null translate-lc.po
+   4. Run picpuz and check how the translations look. If the
+      computer locale is not "lc" you can start picpuz in the
+      target language with the command: $ picpuz -l lc
+   5. Send the modified .po file to kornelix@posteo.de
+      so it can be included in future releases.
+
+Step 3 is optional. The usual binary translation files (.mo) that are
+output by msgfmt are not needed by picpuz. The translation source
+files (.po) are read directly by picpuz, and changes made to a .po
+file are effective the next time picpuz is started. Step 3 is useful
+to find errors (e.g. missing or non-matching format codes).
+
+Whenever picpuz is started from a terminal, missing translations
+are listed in the terminal window.
+
+PROBLEMS WITH LONG TRANSLATIONS
+
+English can be terse compared to other languages (e.g. "undo" is
+"Rückgängig machen" in German), and this can cause ugliness in the
+GUI layouts. Therefore try to make dialog labels and buttons short,
+and look closely at the resulting GUI layout.
+
+CONTEXT DEPENDENT TRANSLATIONS
+
+Sometimes the same English text will need multiple translations that
+depend on context. A simple example is "save file" when used on a
+toolbar button or in a menu. On the button the translation should be
+short, but there is no limit for the menu. In German, this could be
+"speichern" for the button and "in eine Datei speichern" for the menu.
+The standard method to do this in Gnu gettext is fairly horrible, but
+since picpuz reads the source translations (.po files) instead of
+the binaries (.mo files), a simpler method is available. The English
+text may include an extra string to distinguish different contexts.
+This context string is removed from the GUI output, so the user does
+not see it. The context string is any short string followed with the
+special marker "::". To continue our example, the translate-lc.po
+file might look like this:
+   msgid "save file"
+   msgstr "in eine Datei speichern"
+   msgid "toolbar::save file"
+   msgstr "speichern"
+In English, picpuz would show "save file" for both cases, and in
+German "in eine Datei speichern" or "speichern".
+
+USER GUIDE TRANSLATION
+
+The user guide is normally found here:
+   /usr/share/picpuz/data/userguide-lc.html  (or -lc_RC.html)
+
+The file is a text HTML file, which may be edited with any HTML editor.
+
+If a file with the region code is present, this file is used by picpuz,
+otherwise the standard language version is used. If this is not found,
+the English file (userguide-en.html) is used.
+
+If you make a new or revised translation, please send it to
+kornelix@posteo.de  so it can be included in future releases.
+
+

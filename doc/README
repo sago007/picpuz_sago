@@ -1,0 +1,30 @@
+Installation of picpuz from source tarball
+  
+Building picpuz requires the following packages:
+   g++                the Gnu C++ compiler and linker 
+   libgtk3.0-dev      GTK graphics library (GUI base)
+
+Build and install picpuz as follows:
+   1. Download the tar file (picpuz-N.N.tar.gz) to Desktop 
+   2. Open a terminal window 
+   3. $ cd Desktop                      # go to Desktop 
+   4. $ tar -xzf picpuz-N.N.tar.gz      # unpack to ./picpuz 
+   5. $ cd picpuz                       # go there 
+   6. $ make                            # build program 
+   7. $ sudo make install               # install program
+  
+Missing dependencies will cause error messages in step 6. 
+Install these from your repository and repeat step 6. 
+ 
+Step 7 moves all files to the following locations:
+   /usr/bin/picpuz             binary executable 
+   /usr/share/picpuz/          icons, translations ... 
+   /usr/share/doc/picpuz/      user guide, README ... 
+
+Please review the user guide (Help menu) before trying picpuz.
+
+NOTES FOR PACKAGE BUILDERS:
+If $PREFIX is defined, files go there instead of /usr. 
+If $DESTDIR is also defined, files go to $DESTDIR$PREFIX. 
+
+

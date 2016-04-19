@@ -1,0 +1,403 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-01 10:54+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator:  <jgvnet@gmail.com>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: picpuz-2.6.cc:128 picpuz-2.6.cc:207 zfuncs.cc:7101
+msgid "open"
+msgstr "Openen"
+
+#: picpuz-2.6.cc:128
+msgid "open new image file"
+msgstr "Nieuwe afbeelding openen"
+
+#: picpuz-2.6.cc:129
+msgid "set tile size"
+msgstr "Grootte van puzzelstukjes wijzigen"
+
+#: picpuz-2.6.cc:129 picpuz-2.6.cc:208
+msgid "tile"
+msgstr "Puzzelstukjes"
+
+#: picpuz-2.6.cc:130 picpuz-2.6.cc:209
+msgid "mix"
+msgstr "Mixen"
+
+#: picpuz-2.6.cc:130
+msgid "randomize tiles"
+msgstr "Puzzelstukjes door elkaar"
+
+#: picpuz-2.6.cc:131 picpuz-2.6.cc:210
+msgid "show"
+msgstr "Tonen"
+
+#: picpuz-2.6.cc:131
+msgid "show image file"
+msgstr "Afbeelding tonen"
+
+#: picpuz-2.6.cc:132 picpuz-2.6.cc:389
+msgid "save puzzle to a file"
+msgstr "Puzzel opslaan"
+
+#: picpuz-2.6.cc:132 picpuz-2.6.cc:211
+msgid "toolbar::save"
+msgstr "Opslaan"
+
+#: picpuz-2.6.cc:133 picpuz-2.6.cc:212
+msgid "resume"
+msgstr "Doorgaan"
+
+#: picpuz-2.6.cc:133
+msgid "resume saved puzzle"
+msgstr "Doorgaan met opgeslagen puzzel"
+
+#: picpuz-2.6.cc:134 picpuz-2.6.cc:213
+msgid "do 1"
+msgstr "Doe er een"
+
+#: picpuz-2.6.cc:134
+msgid "move one tile home"
+msgstr "Een stukje naar de juiste plaats"
+
+#: picpuz-2.6.cc:135 picpuz-2.6.cc:214
+msgid "do 8"
+msgstr "Doe er tien"
+
+#: picpuz-2.6.cc:135
+msgid "move eight tiles home"
+msgstr ""
+
+#: picpuz-2.6.cc:136
+msgid "change tile border line"
+msgstr "Randen van puzzelstukjes wijzigen"
+
+#: picpuz-2.6.cc:136 picpuz-2.6.cc:215
+msgid "line"
+msgstr "Lijnweergave"
+
+#: picpuz-2.6.cc:137 picpuz-2.6.cc:216
+msgid "quit"
+msgstr "Stoppen"
+
+#: picpuz-2.6.cc:137
+msgid "quit picpuz"
+msgstr "Picpuz verlaten"
+
+#: picpuz-2.6.cc:138 picpuz-2.6.cc:217
+msgid "help"
+msgstr "Help"
+
+#: picpuz-2.6.cc:138
+msgid "view help document"
+msgstr "Helpinformatie bekijken"
+
+#: picpuz-2.6.cc:234
+msgid "select image file"
+msgstr "Beeldbestand selecteren"
+
+#: picpuz-2.6.cc:270 zfuncs.cc:6894 zfuncs.cc:6933 zfuncs.cc:7139
+#: zfuncs.cc:7457 zfuncs.cc:8801 zfuncs.cc:8807 zfuncs.cc:8813 zfuncs.cc:8819
+msgid "cancel"
+msgstr "Annuleren"
+
+#: picpuz-2.6.cc:270
+msgid "change tile size"
+msgstr "Grootte van puzzelstukjes wijzigen"
+
+#: picpuz-2.6.cc:272
+msgid "new tile size (pixels)"
+msgstr "Nieuwe grootte van de puzzelstukjes (pixels)"
+
+#: picpuz-2.6.cc:394 picpuz-2.6.cc:435
+#, c-format
+msgid "cannot open: %s"
+msgstr "Kan %s niet openen"
+
+#: picpuz-2.6.cc:430
+msgid "load puzzle from file"
+msgstr "Opgeslagen puzzel ophalen"
+
+#: picpuz-2.6.cc:477
+msgid "saved puzzle file is not valid"
+msgstr "Opgeslagen puzzelbestand is niet geldig"
+
+#: picpuz-2.6.cc:563
+msgid "DISCARD unfinished puzzle?"
+msgstr "Lopende puzzel wegdoen?"
+
+#: picpuz-2.6.cc:596
+#, c-format
+msgid ""
+"image type not recognized:\n"
+" %s"
+msgstr ""
+"Afbeeldingstype wordt niet herkend:\n"
+" %s"
+
+#: picpuz-2.6.cc:605
+msgid "image too small, please select another"
+msgstr "Afbeelding te klein; kies een andere"
+
+#: picpuz-2.6.cc:1046
+#, c-format
+msgid "tiles home: %d/%d"
+msgstr "Aantal puzzelstukjes op de goede plaats: %d/%d"
+
+#: picpuz-2.6.cc:1047
+msgid "1st tile selected"
+msgstr "Eerste puzzelstuk geselecteerd"
+
+#: zfuncs.cc:3369
+#, c-format
+msgid "help file not found: %s"
+msgstr "help bestand niet gevonden: %s"
+
+#: zfuncs.cc:3482
+#, c-format
+msgid "error: %s"
+msgstr "fout: %s"
+
+#: zfuncs.cc:3805 zfuncs.cc:8688
+#, c-format
+msgid "cannot open file %s"
+msgstr "kan bestand niet openen %s"
+
+#: zfuncs.cc:3838
+msgid "save screen to file"
+msgstr "schrijf scherm naar bestand"
+
+#: zfuncs.cc:6815
+msgid "No"
+msgstr "Nee"
+
+#: zfuncs.cc:6815
+msgid "Yes"
+msgstr "Ja"
+
+#: zfuncs.cc:7106
+msgid "choose"
+msgstr "Kies"
+
+#: zfuncs.cc:7111
+msgid "save"
+msgstr "opslaan"
+
+#: zfuncs.cc:7117
+msgid "open folder"
+msgstr "open map"
+
+#: zfuncs.cc:7122
+msgid "create folder"
+msgstr "aanmaken map"
+
+#: zfuncs.cc:7128
+msgid "hidden"
+msgstr "verborgen"
+
+#: zfuncs.cc:7132
+msgid "quality"
+msgstr "kwaliteit"
+
+#: zfuncs.cc:7189
+msgid "JPG quality 0-100"
+msgstr "JPG kwaliteit 0-100"
+
+#: zfuncs.cc:7448
+#, c-format
+msgid "printed image width: %.1f  height: %.1f  cm"
+msgstr ""
+
+#: zfuncs.cc:7457
+msgid "done"
+msgstr "klaar"
+
+#: zfuncs.cc:7457 zfuncs.cc:7469
+msgid "margins"
+msgstr ""
+
+#: zfuncs.cc:7465
+msgid "top"
+msgstr ""
+
+#: zfuncs.cc:7466
+msgid "bottom"
+msgstr ""
+
+#: zfuncs.cc:7467
+msgid "left"
+msgstr ""
+
+#: zfuncs.cc:7468
+msgid "right"
+msgstr ""
+
+#: zfuncs.cc:7475
+msgid "image scale"
+msgstr ""
+
+#: zfuncs.cc:7477
+msgid "percent"
+msgstr ""
+
+#: zfuncs.cc:8575
+msgid ""
+"Initial parameters file created. \n"
+"Inspect and revise if necessary."
+msgstr ""
+"Initieel parameter bestand wordt aangemaakt. \n"
+"Zo nodig controleren en verbeteren."
+
+#: zfuncs.cc:8591
+msgid "load parameters from a file"
+msgstr "laden parameters uit bestand"
+
+#: zfuncs.cc:8660
+msgid "save parameters to a file"
+msgstr "schrijf parameters naar bestand"
+
+#: zfuncs.cc:8799 zfuncs.cc:8805 zfuncs.cc:8811 zfuncs.cc:8817
+msgid "edit parameters"
+msgstr "aanpassen parameters"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806
+msgid ""
+"list\n"
+"all"
+msgstr ""
+"opsommen\n"
+"alle"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806 zfuncs.cc:8812 zfuncs.cc:8818
+msgid ""
+"load\n"
+"file"
+msgstr ""
+"laden\n"
+"bestand"
+
+#: zfuncs.cc:8800 zfuncs.cc:8806 zfuncs.cc:8812 zfuncs.cc:8818
+msgid ""
+"save\n"
+"file"
+msgstr ""
+"opslaan\n"
+"bestand"
+
+#: zfuncs.cc:8801 zfuncs.cc:8813
+msgid ""
+"add\n"
+"new"
+msgstr ""
+"toevoegen\n"
+"nieuw"
+
+#: zfuncs.cc:8801 zfuncs.cc:8807 zfuncs.cc:8813 zfuncs.cc:8819
+msgid "apply"
+msgstr "toepassen"
+
+#: zfuncs.cc:8854
+msgid "apply?"
+msgstr "toepassen?"
+
+#: zfuncs.cc:8911
+msgid "(new parm name)"
+msgstr "(nieuwe parameter naam)"
+
+#: zfuncs.cc:8911
+msgid "add parameter"
+msgstr "toevoegen parameter"
+
+#~ msgid "gallery"
+#~ msgstr "Overzicht"
+
+#~ msgid "image gallery"
+#~ msgstr "Afbeeldingenoverzicht"
+
+#~ msgid "prev"
+#~ msgstr "Vorige"
+
+#~ msgid "previous image file"
+#~ msgstr "Vorige afbeelding"
+
+#~ msgid "next"
+#~ msgstr "Volgende"
+
+#~ msgid "next image file"
+#~ msgstr "Volgende afbeelding"
+
+#~ msgid "bigger"
+#~ msgstr "groter"
+
+#~ msgid "increase thumbnail size"
+#~ msgstr "vergroten miniaturen"
+
+#~ msgid "reduce thumbnail size"
+#~ msgstr "verkleinen miniaturen"
+
+#~ msgid "smaller"
+#~ msgstr "kleiner"
+
+#~ msgid "parent"
+#~ msgstr "moeder"
+
+#~ msgid "parent directory"
+#~ msgstr "bovenliggende map"
+
+#~ msgid "first page"
+#~ msgstr "eerste pagina"
+
+#~ msgid "jump to first file"
+#~ msgstr "spring naar eerste bestand"
+
+#~ msgid "prev page"
+#~ msgstr "vorige pagina"
+
+#~ msgid "previous page"
+#~ msgstr "vorige pagina"
+
+#~ msgid "prev row"
+#~ msgstr "vorige rij"
+
+#~ msgid "previous row"
+#~ msgstr "vorige rij"
+
+#~ msgid "next row"
+#~ msgstr "volgende rij"
+
+#~ msgid "next page"
+#~ msgstr "volgende pagina"
+
+#~ msgid "jump to last file"
+#~ msgstr "spring naar laatste bestand"
+
+#~ msgid "last page"
+#~ msgstr "laatste pagina"
+
+#~ msgid "close"
+#~ msgstr "sluiten"
+
+#~ msgid "close image gallery"
+#~ msgstr "sluiten afbeeldingsgalerie"
+
+#~ msgid "select new file"
+#~ msgstr "selecteer nieuw bestand"
+
+#~ msgid "Select Files"
+#~ msgstr "Selecteer bestanden"
+
+#~ msgid "delete"
+#~ msgstr "verwijder"
+
+#~ msgid "insert"
+#~ msgstr "invoegen"
+
+#~ msgid "add all"
+#~ msgstr "alles toevoegen"

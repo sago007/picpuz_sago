@@ -1,6 +1,6 @@
 PROGRAM = picpuz
 VERSION = 2.7
-SOURCE = $(PROGRAM)-$(VERSION).cc
+SOURCE = $(PROGRAM).cc
 
 # defaults for parameters that may be pre-defined
 CXXFLAGS += -Wall -ggdb

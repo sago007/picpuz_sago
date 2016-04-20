@@ -4333,7 +4333,7 @@ int zinitapp(cchar *appname)
       strncpy0(zdocdir,DOCDIR,199);                                              //  flexible DOCDIR location
    #endif
 
-   snprintf(zuserdir,199,"%s/.%s",getenv("HOME"),zappname);                      //  /home/<username>/.appname/
+   snprintf(zuserdir,sizeof(zuserdir),"%s/.local/share/%s",getenv("HOME"),zappname);                      //  /home/<username>/.appname/
    cc = strlen(zuserdir);                                                        //  stop humongous username         5.3
    if (cc > 160) zappcrash("too big: %s",zuserdir);
 

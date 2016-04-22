@@ -1,37 +1,37 @@
-PROGRAM = picpuz
-VERSION = 2.7
-SOURCE = $(PROGRAM).cc
+CC=$(CROSS)gcc
+CXX=$(CROSS)g++
+LD=$(CROSS)ld
+AR=$(CROSS)ar
+PKG_CONFIG=$(CROSS)pkg-config
 
-# defaults for parameters that may be pre-defined
-CXXFLAGS += -Wall -ggdb
-LDFLAGS += -rdynamic
-PREFIX ?= /usr
-CPPFLAGS ?= -O2
+BASE_LIBS=
+BASE_CFLAGS=-c -g -O2 -Wall -std=c++11
 
-# target install directories
-BINDIR = $(PREFIX)/bin
-SHAREDIR = $(PREFIX)/share/$(PROGRAM)
-DATADIR = $(SHAREDIR)/data
-ICONDIR = $(SHAREDIR)/icons
-LOCALESDIR = $(SHAREDIR)/locales
-DOCDIR = $(PREFIX)/share/doc/$(PROGRAM)
-MANDIR = $(PREFIX)/share/man/man1
-APPDATADIR = $(PREFIX)/share/appdata
-MENUFILE = $(PREFIX)/share/applications/$(PROGRAM).desktop
+BASE_LIBS+= -rdynamic `$(PKG_CONFIG) --libs gtk+-3.0` -lpthread
+BASE_CFLAGS+= -c `$(PKG_CONFIG) --cflags gtk+-3.0`
 
-CFLAGS = $(CXXFLAGS) -c `pkg-config --cflags gtk+-3.0`
-CFLAGS += $(CPPFLAGS)
-LIBS = `pkg-config --libs gtk+-3.0` -lpthread
+PROGRAMNAME=picpuz
 
-$(PROGRAM): $(PROGRAM).o zfuncs.o
-	$(CXX) $(LDFLAGS) -o $(PROGRAM) $(PROGRAM).o zfuncs.o $(LIBS)
+O_FILES=picpuz.o zfuncs.o
 
-$(PROGRAM).o: $(SOURCE)
-	$(CXX) $(CFLAGS) -o $(PROGRAM).o $(SOURCE)
+total: ${PROGRAMNAME}
 
-zfuncs.o: zfuncs.cc zfuncs.h
-	$(CXX) $(CFLAGS) zfuncs.cc    \
-          -D PREFIX=\"$(PREFIX)\" -D DOCDIR=\"$(DOCDIR)\"
+clean: 
+	rm -f */*.o *.o *.P */*.P ${PROGRAMNAME}
+
+${PROGRAMNAME}: $(O_FILES)
+	$(CXX) -O -o ${PROGRAMNAME} $(O_FILES) $(BASE_LIBS)
+
+%.o : %.cc
+	$(CXX) -MD ${BASE_CFLAGS} -o $@ $<
+	@mkdir -p `dirname .$(CROSS)deps/$*.P` && cp $*.d .$(CROSS)deps/$*.P; \
+             sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+                 -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> .$(CROSS)deps/$*.P; \
+             rm -f $*.d
+
+-include .$(CROSS)deps/*.P
+
+SOURCE_FILES = $(O_FILES:.o=.cc)
 
 install: $(PROGRAM) uninstall
 	mkdir -p  $(DESTDIR)$(BINDIR)
@@ -62,9 +62,3 @@ uninstall:
 	rm -f -R  $(DESTDIR)$(DOCDIR)
 	rm -f  $(DESTDIR)$(MANDIR)/$(PROGRAM).1.gz
 	rm -f  $(DESTDIR)$(MENUFILE)
-
-clean: 
-	rm -f  $(PROGRAM)
-	rm -f  *.o
- 
-

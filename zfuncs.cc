@@ -4333,7 +4333,18 @@ int zinitapp(cchar *appname)
       strncpy0(zdocdir,DOCDIR,199);                                              //  flexible DOCDIR location
    #endif
 
-   snprintf(zuserdir,sizeof(zuserdir),"%s/.local/share/%s",getenv("HOME"),zappname);                      //  /home/<username>/.appname/
+   if (!getenv("HOME")) {
+      zappcrash("The environment variable \"HOME\" must be set");
+   }
+
+   const char *xdg_data_dir = getenv("XDG_DATA_DIRS"); 
+	  
+   if (xdg_data_dir) {
+      snprintf(zuserdir,sizeof(zuserdir),"%s/%s",xdg_data_dir,zappname);
+   }
+   else {
+      snprintf(zuserdir,sizeof(zuserdir),"%s/.local/share/%s",getenv("HOME"),zappname);  //  /home/<username>/.local/share/appname/
+   }
    cc = strlen(zuserdir);                                                        //  stop humongous username         5.3
    if (cc > 160) zappcrash("too big: %s",zuserdir);
 

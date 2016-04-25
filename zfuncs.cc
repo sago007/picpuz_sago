@@ -4337,7 +4337,7 @@ int zinitapp(cchar *appname)
       zappcrash("The environment variable \"HOME\" must be set");
    }
 
-   const char *xdg_data_dir = getenv("XDG_DATA_DIRS"); 
+   const char *xdg_data_dir = getenv("XDG_DATA_HOME"); 
 	  
    if (xdg_data_dir) {
       snprintf(zuserdir,sizeof(zuserdir),"%s/%s",xdg_data_dir,zappname);

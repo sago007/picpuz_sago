@@ -23,8 +23,10 @@
 #include "zfuncs.h"
 #include <gtk/gtk.h>
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 #define gtitle "Picpuz v.2.7"                                                    //  version
 #define Tindex(row,col) row * Ncols + col                                        //  map row/col to linear index
@@ -828,7 +830,7 @@ void swap2(int row1, int col1, int row2, int col2)
 void swap3(int row1, int col1, int row2, int col2)
 {
    int      ii1, iix, iiy, jj, kk, drow, dcol, change;
-   int      *Rstack, *Cstack, Nstack, Estack;
+   int      Nstack, Estack;
    int      adjrow[4] = { -1, 0, 0, +1 };
    int      adjcol[4] = { 0, -1, +1, 0 };
    int      rowx, colx, rowy, coly, rowz, colz;
@@ -840,8 +842,8 @@ void swap3(int row1, int col1, int row2, int col2)
    drow = row2 - row1;
    dcol = col2 - col1;
 
-   Rstack = (int *) malloc(Ntiles * sizeof(int));                                //  stack of tile positions
-   Cstack = (int *) malloc(Ntiles * sizeof(int));                                //    to be filled with home tiles
+   vector<int> Rstack(Ntiles);
+   vector<int> Cstack(Ntiles);
 
    Rstack[0] = row1;
    Cstack[0] = col1;
@@ -902,9 +904,6 @@ void swap3(int row1, int col1, int row2, int col2)
          }
       }
    }
-
-   free(Rstack);
-   free(Cstack);
    return;
 }
 

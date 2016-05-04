@@ -49,7 +49,7 @@ int64       rseed;                                                              
 int         debug = 0;                                                           //  from command line: -d
 
 string        imagedirk = "";                                                //  image directory
-char        clfile[XFCC] = "";                                                   //  command line file
+string        clfile = "";                                                   //  command line file
 string        imagefile = "";                                                      //  image file pathname
 string        pname;                                                          //  puzzle name
 int         winW = 900, winH = 600;                                              //  window size
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 {
    int         ii;
    GtkWidget   *tbar;
-   char        lang[8] = "";
+   string        lang;
 
    gtk_init(&argc, &argv);                                                       //  GTK command line options
 
@@ -114,15 +114,15 @@ int main(int argc, char *argv[])
       if (strmatch(argv[ii],"-d"))                                               //  -d (debug flag)
             debug = 1;
       else if (strmatch(argv[ii],"-l") && argc > ii+1)                           //  -l language code
-            strncpy0(lang,argv[++ii],7);
+            lang = argv[++ii];
       else if (strmatch(argv[ii],"-i") && argc > ii+1)                           //  -i imageDirectory
             imagedirk = argv[++ii];
       else if (strmatch(argv[ii],"-f") && argc > ii+1)                           //  -f imageFile
-            strcpy(clfile,argv[++ii]);
-      else strcpy(clfile,argv[ii]);                                              //  assume imageFile
+            clfile = argv[++ii];
+      else clfile = argv[ii];                                              //  assume imageFile
    }
 
-   ZTXinit(lang);                                                                //  setup translations   v.1.9
+   ZTXinit(lang.c_str());                                                                //  setup translations   v.1.9
 
    win1 = gtk_window_new(GTK_WINDOW_TOPLEVEL);                                   //  create main window
    gtk_window_set_title(GTK_WINDOW(win1),gtitle);
@@ -179,9 +179,9 @@ int gtkinitfunc(void *)
 
    if (imagedirk.length() == 0) load_imagedirk();                                           //  get image directory   v.1.8
 
-   if (*clfile) {                                                                //  command line image file
+   if (clfile.length()) {                                                                //  command line image file
       string p;
-      if (*clfile != '/') {
+      if (clfile[0] != '/') {
 		 p = string(imagedirk) + "/" + clfile;
       }
       else {

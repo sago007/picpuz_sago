@@ -50,7 +50,7 @@ int         debug = 0;                                                          
 
 string        imagedirk = "";                                                //  image directory
 char        clfile[XFCC] = "";                                                   //  command line file
-char        *imagefile = 0;                                                      //  image file pathname
+string        imagefile = "";                                                      //  image file pathname
 char        pname[100];                                                          //  puzzle name
 int         winW = 900, winH = 600;                                              //  window size
 int         imageW, imageH;                                                      //  image size
@@ -242,7 +242,6 @@ void m_open(const char *file)
       if (! newfile) return;
    }
 
-   if (imagefile) free(imagefile);
    imagefile = newfile;
 
    imagedirk = imagefile;                                                  //  set new image directory
@@ -388,14 +387,13 @@ void m_save()
    FILE           *fid;
    char           *sfile;
    int            ii, row, col;
-   char           savefile[1000];                                                //  saved puzzle file name
+   string           savefile;                                                //  saved puzzle file name
 
    if (! Ntiles) return;
+                                                     //  /home/user/.local/share/picpuz/pname.puz
+   savefile = string(get_zuserdir())+"/"+pname+".puz";
 
-   *savefile = 0;                                                                //  /home/user/.picpuz/pname.puz
-   strncatv(savefile,999,get_zuserdir(),"/",pname,".puz",null);
-
-   sfile = zgetfile(ZTX("save puzzle to a file"),MWIN,"save",savefile);
+   sfile = zgetfile(ZTX("save puzzle to a file"),MWIN,"save",savefile.c_str());
    if (! sfile) return;
 
    fid = fopen(sfile,"w");
@@ -405,7 +403,7 @@ void m_save()
       return;
    }
 
-   fprintf(fid,"%s \n",imagefile);                                               //  save image file
+   fprintf(fid,"%s \n",imagefile.c_str());                                               //  save image file
    fprintf(fid," %d %d \n",Ntiles,Nhome);                                        //  save tile count and no. home
    fprintf(fid," %d %d \n",Nrows,Ncols);                                         //  save row and col counts
 
@@ -451,7 +449,6 @@ void m_resume()
    pp = fgets_trim(newfile,XFCC-1,fid,1);                                        //  read image file name
    if (! pp) goto badfile;
 
-   if (imagefile) free(imagefile);
    imagefile = newfile;
 
    stat = fscanf(fid," %d %d ",&Ntiles,&Nhome);
@@ -591,16 +588,16 @@ void m_help()                                                                   
 void init_puzzle(int newp)
 {
    GError      *gerror = 0;
-   char        *pp;
+   const char        *pp;
 
-   if (! imagefile) return;
+   if (imagefile.length() == 0) return;
 
-   pp = (char *) strrchr(imagefile,'/');                                         //  puzzle name = image file name
-   if (! pp++) pp = imagefile;
+   pp = strrchr(imagefile.c_str(),'/');                                         //  puzzle name = image file name
+   if (! pp++) pp = imagefile.c_str();
    strncpy0(pname,pp,99);
 
    if (iPixbuf) g_object_unref(iPixbuf);
-   iPixbuf = gdk_pixbuf_new_from_file(imagefile,&gerror);                        //  create pixbuf from image file
+   iPixbuf = gdk_pixbuf_new_from_file(imagefile.c_str(),&gerror);                        //  create pixbuf from image file
    if (!iPixbuf) {
       zmessageACK(win1,ZTX("image type not recognized:\n %s"),imagefile);
       clear_puzzle();

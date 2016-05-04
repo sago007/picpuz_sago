@@ -51,7 +51,7 @@ int         debug = 0;                                                          
 string        imagedirk = "";                                                //  image directory
 char        clfile[XFCC] = "";                                                   //  command line file
 string        imagefile = "";                                                      //  image file pathname
-char        pname[100];                                                          //  puzzle name
+string        pname;                                                          //  puzzle name
 int         winW = 900, winH = 600;                                              //  window size
 int         imageW, imageH;                                                      //  image size
 int         tileU = 80;                                                          //  tile size, user setpoint
@@ -355,7 +355,7 @@ void win2_paint(GtkWidget *, cairo_t *cr)
 
    if (! iPixbuf) return;
 
-   gtk_window_set_title(GTK_WINDOW(win2),pname);
+   gtk_window_set_title(GTK_WINDOW(win2),pname.c_str());
 
    winx = gtk_widget_get_allocated_width(dwin2);                                 //  curr. window size
    winy = gtk_widget_get_allocated_height(dwin2);
@@ -594,7 +594,7 @@ void init_puzzle(int newp)
 
    pp = strrchr(imagefile.c_str(),'/');                                         //  puzzle name = image file name
    if (! pp++) pp = imagefile.c_str();
-   strncpy0(pname,pp,99);
+   pname = pp;
 
    if (iPixbuf) g_object_unref(iPixbuf);
    iPixbuf = gdk_pixbuf_new_from_file(imagefile.c_str(),&gerror);                        //  create pixbuf from image file

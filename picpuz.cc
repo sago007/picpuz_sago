@@ -46,7 +46,7 @@ timeval     rtime;
 int64       rseed;                                                               //  random number seed
 int         debug = 0;                                                           //  from command line: -d
 
-char        imagedirk[XFCC] = "";                                                //  image directory
+string        imagedirk = "";                                                //  image directory
 char        clfile[XFCC] = "";                                                   //  command line file
 char        *imagefile = 0;                                                      //  image file pathname
 char        pname[100];                                                          //  puzzle name
@@ -83,7 +83,7 @@ void winpaint(GtkWidget *, cairo_t *);                                          
 void menufunc(GtkWidget *, const char *menu);                                    //  menu processor
 void destroyfunc();                                                              //  window destroy signal function
 int  puzzle_status();                                                            //  test puzzle status
-void drag_drop(int x, int y, char *file);                                        //  drag/drop event handler   v.2.4
+void drag_drop(int x, int y, const char *file);                                        //  drag/drop event handler   v.2.4
 void init_puzzle(int init);                                                      //  initialize puzzle
 void clear_puzzle();                                                             //  release memory, set no puzzle
 void tile_window(int init);                                                      //  paint tiles to window
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
       else if (strmatch(argv[ii],"-l") && argc > ii+1)                           //  -l language code
             strncpy0(lang,argv[++ii],7);
       else if (strmatch(argv[ii],"-i") && argc > ii+1)                           //  -i imageDirectory
-            strcpy(imagedirk,argv[++ii]);
+            imagedirk = argv[++ii];
       else if (strmatch(argv[ii],"-f") && argc > ii+1)                           //  -f imageFile
             strcpy(clfile,argv[++ii]);
       else strcpy(clfile,argv[ii]);                                              //  assume imageFile
@@ -175,7 +175,7 @@ int gtkinitfunc(void *)
    gettimeofday(&rtime,0);                                                       //  random number seed
    rseed = rtime.tv_sec;
 
-   if (! *imagedirk) load_imagedirk();                                           //  get image directory   v.1.8
+   if (imagedirk.length() == 0) load_imagedirk();                                           //  get image directory   v.1.8
 
    if (*clfile) {                                                                //  command line image file
       string p;
@@ -227,7 +227,7 @@ void menufunc(GtkWidget *, const char *menu)
 
 void m_open(const char *file)
 {
-   char        *newfile = 0, *pp;
+   char        *newfile = 0;
 
    if (file && strmatch(file,"F1")) return;                                      //  context help     v.2.1
 
@@ -236,16 +236,18 @@ void m_open(const char *file)
 
    if (file) newfile = strdup(file);
    if (! newfile) {
-      newfile = zgetfile(ZTX("select image file"),MWIN,"file",imagedirk);
+      newfile = zgetfile(ZTX("select image file"),MWIN,"file",imagedirk.c_str());
       if (! newfile) return;
    }
 
    if (imagefile) free(imagefile);
    imagefile = newfile;
 
-   strcpy(imagedirk,imagefile);                                                  //  set new image directory
-   pp = (char *) strrchr(imagedirk,'/');
-   pp[1] = 0;
+   imagedirk = imagefile;                                                  //  set new image directory
+   std::size_t found = imagedirk.find_last_of("/");
+   if (found != string::npos) {
+	   imagedirk.substr(0, found+1);
+   }
 
    if (win2) gtk_widget_destroy(win2);                                           //  reference window obsolete    v.2.1.3
    init_puzzle(1);                                                               //  initz. main window
@@ -255,7 +257,7 @@ void m_open(const char *file)
 
 //  drag-drap enent. open the dropped file.
 
-void drag_drop(int x, int y, char *file)                                         //  v.2.4
+void drag_drop(int x, int y, const char *file)                                         //  v.2.4
 {
    m_open(file);
    return;
@@ -1060,7 +1062,7 @@ void stbar_update()
 
 void save_imagedirk()
 {
-   shell_ack("echo %s > %s/image_directory",imagedirk, get_zuserdir());
+   shell_ack("echo %s > %s/image_directory",imagedirk.c_str(), get_zuserdir());
    return;
 }
 
@@ -1071,8 +1073,9 @@ void load_imagedirk()
    STATB    statdat;
    char     dirbuff[XFCC], *pp;
 
-   pp = getcwd(imagedirk,XFCC-1);                                                //  default is current directory
-
+   pp = getcwd(dirbuff,XFCC-1);                                                //  default is current directory
+   imagedirk = dirbuff;
+   
    snprintf(dirbuff,XFCC-1,"%s/image_directory",get_zuserdir());                 //  read saved file
    fid = fopen(dirbuff,"r");
    if (! fid) return;
@@ -1082,7 +1085,7 @@ void load_imagedirk()
    err = stat(dirbuff,&statdat);                                                 //  contains a valid directory name?
    if (err) return;
    if (! S_ISDIR(statdat.st_mode)) return;
-   strcpy(imagedirk,dirbuff);                                                    //  yes, use it
+   imagedirk = dirbuff;                                                    //  yes, use it
    return;
 }
 

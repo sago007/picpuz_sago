@@ -5749,7 +5749,7 @@ namespace gmenuznames
    void  draw_text(cairo_t *, char *, int px, int py, int &ww, int &hh);         //  draw text and return pixel extent
    void  edit_menu();                                                            //  dialog to create/edit menu entry
    int   edit_menu_event(zdialog *zd, cchar *event);                             //  dialog event function
-   void  drag_drop_event(int mx, int my, char *file);                            //  drag-drop event function
+   void  drag_drop_event(int mx, int my, const char *file);                            //  drag-drop event function
 }
 
 
@@ -6335,7 +6335,7 @@ int gmenuznames::edit_menu_event(zdialog *zd, cchar *event)
 //  function to accept drag-drop of a desktop application icon
 //  process the associated text desktop file
 
-void gmenuznames::drag_drop_event(int mpx, int mpy, char *file)                  //  v.6.2
+void gmenuznames::drag_drop_event(int mpx, int mpy, const char *file)                  //  v.6.2
 {
    using namespace gmenuznames;
    

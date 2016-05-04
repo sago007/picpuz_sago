@@ -525,7 +525,7 @@ void print_image_file(GtkWidget *parent, cchar *imagefile);
 
 //  drag and drop functions
 
-typedef void drag_drop_func(int x, int y, char *text);                           //  user function, get drag_drop text
+typedef void drag_drop_func(int x, int y, const char *text);                           //  user function, get drag_drop text
 void drag_drop_connect(GtkWidget *window, drag_drop_func);                       //  connect window to user function
 
 //  miscellaneous GDK/GTK functions

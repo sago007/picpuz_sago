@@ -21,6 +21,10 @@
 ***************************************************************************/
 
 #include "zfuncs.h"
+#include <gtk/gtk.h>
+#include <string>
+
+using std::string;
 
 #define gtitle "Picpuz v.2.7"                                                    //  version
 #define Tindex(row,col) row * Ncols + col                                        //  map row/col to linear index
@@ -63,7 +67,7 @@ struct tileposn_t {
 tileposn_t   *wposn = 0;                                                         //  window position of home tile
 tileposn_t   *hposn = 0;                                                         //  home position of window tile
 
-void m_open(char *file);                                                         //  open image for new puzzle
+void m_open(const char *file);                                                         //  open image for new puzzle
 void m_tile();                                                                   //  set new tile size
 void m_mix();                                                                    //  mix-up pizzle tiles
 void m_show();                                                                   //  show reference image
@@ -168,23 +172,21 @@ int main(int argc, char *argv[])
 
 int gtkinitfunc(void *)
 {
-   char     *pp;
-
    gettimeofday(&rtime,0);                                                       //  random number seed
    rseed = rtime.tv_sec;
 
    if (! *imagedirk) load_imagedirk();                                           //  get image directory   v.1.8
 
    if (*clfile) {                                                                //  command line image file
+      string p;
       if (*clfile != '/') {
-         pp = (char *) malloc(strlen(imagedirk)+strlen(clfile)+5);               //  clfile is relative to imagedirk
-         strcpy(pp,imagedirk);
-         strcat(pp,"/");
-         strcat(pp,clfile);
+		 p = string(imagedirk) + "/" + clfile;
       }
-      else  pp = strdup(clfile);                                                 //  use clfile
+      else {
+		  p = clfile;                                                 //  use clfile
+	  } 
 
-      m_open(pp);                                                                //  open command line file
+      m_open(p.c_str());                                                                //  open command line file
    }
 
    return 0;
@@ -223,7 +225,7 @@ void menufunc(GtkWidget *, const char *menu)
 
 //  create a new puzzle from an image file
 
-void m_open(char *file)
+void m_open(const char *file)
 {
    char        *newfile = 0, *pp;
 

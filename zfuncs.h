@@ -609,30 +609,6 @@ public:
    int Dump();                                                                   //  dump hash table
 };
 
-//  Queue class, FIFO, LIFO or mixed ======================================
-
-class  Queue
-{
-   char        wmi[8];
-   Vxstring  * vd;                                                               //  vector of xstrings
-   mutex_t     qmutex;                                                           //  for multi-thread access
-   int         qcap;                                                             //  queue capacity
-   int         qcount;                                                           //  curr. queue count
-   int         ent1;                                                             //  first entry pointer
-   int         entN;                                                             //  last entry pointer
-   char      * lastent;                                                          //  last entry retrieved
-   int         lcc;                                                              //  last entry cc
-private:
-   void lock();                                                                  //  auto locking and unlocking
-   void unlock();                                                                //  (for multi-thread access)
-public:
-   Queue(int cap);                                                               //  create queue with capacity
-   ~Queue();                                                                     //  destroy queue
-   int getCount();                                                               //  get current entry count
-   int push(const xstring * entry, double secs);                                 //  add new entry with max. wait time
-   xstring * pop1();                                                             //  get 1st entry (oldest)
-   xstring * popN();                                                             //  get Nth entry (newest)
-};
 
 /*  =======================================================================
 

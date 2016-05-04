@@ -568,25 +568,6 @@ class xstring
       int getcc() const { return xcc; }                                          //  return string length
 };
 
-//  vector (array) of xstring =============================================
-
-class Vxstring
-{
-   int        nd;                                                                //  count
-   xstring  * pdata;                                                             //  xstring[nd]
-public:
-   Vxstring(int = 0);                                                            //  constructor
-   ~Vxstring();                                                                  //  destructor
-   Vxstring(const Vxstring &);                                                   //  copy constructor
-   Vxstring operator= (const Vxstring &);                                        //  operator =
-   xstring & operator[] (int);                                                   //  operator []
-   const xstring & operator[] (int) const;                                       //  operator [] (const)
-   int search(cchar * string);                                                   //  find element in unsorted Vxstring
-   int bsearch(cchar * string);                                                  //  find element in sorted Vxstring
-   int sort(int nkeys, int keys[][3]);                                           //  sort by designated subfields
-   int sort(int pos = 0, int cc = 0);                                            //  sort by 1 subfield (cc 0 = all)
-   int getCount() const { return nd; }                                           //  get current count
-};
 
 //  hash table class ======================================================
 

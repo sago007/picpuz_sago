@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
    gtk_window_set_title(GTK_WINDOW(win1),gtitle);
    gtk_window_set_position(GTK_WINDOW(win1),GTK_WIN_POS_CENTER);
    gtk_window_set_default_size(GTK_WINDOW(win1),winW,winH);
+   gtk_window_maximize(GTK_WINDOW(win1));
 
    vbox1 = gtk_box_new(VERTICAL,0);                                              //  add vertical packing box
    gtk_container_add(GTK_CONTAINER(win1),vbox1);

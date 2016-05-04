@@ -22,12 +22,9 @@
 
 //     zfuncs.h   version  v.6.2
 
-#include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <sys/resource.h>
 #include <sys/file.h>
-#include <sys/utsname.h>
 #include <malloc.h>
 #include <errno.h>
 #include <unistd.h>
@@ -40,7 +37,6 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <signal.h>
-#include <execinfo.h>
 #include <locale.h>
 #include <gtk/gtk.h>
 
@@ -82,17 +78,15 @@
 
 //  system functions ======================================================
 
-void *zmalloc(uint cc);                                                          //  malloc() with counter              v.5.8
+void *zmalloc(unsigned int cc);                                                          //  malloc() with counter              v.5.8
 void zfree(void *pp);                                                            //  free() with counter
 char *zstrdup(cchar *string, int addcc = 0);                                     //  strdup() with counter
-void zmalloc_report();                                                           //  print statistics report            v.5.9
 
 void printz(cchar *format, ...);                                                 //  printf() with immediate fflush()   v.5.8
 void zpopup_message(int secs, cchar *format, ...);                               //  popup message, thread safe
 
 void zbacktrace();                                                               //  produce a backtrace to stdout      v.5.9
 void zappcrash(cchar *format, ...);                                              //  crash with popup message in text window
-void catch_signals();                                                            //  catch signals and do backtrace dump
 void trace(cchar *file, cchar *func, int line, void *addr);                      //  implements TRACE macro
 void tracedump();                                                                //  dump program trace data
 
@@ -163,7 +157,7 @@ cchar * strField(cchar *string, cchar *delims, int Nth);                        
 cchar * strField(cchar *string, cchar delim, int Nth);                           //  get Nth delimited field in string
 int  strParms(int &bf, cchar *inp, char *pname, int maxcc, double &pval);        //  parse string: name1=val1 | name2 ...
 int  strHash(cchar *string, int max);                                            //  string --> random int 0 to max-1
-int  strncpy0(char *dest, cchar *source, uint cc);                               //  strncpy, insure null, return 0 if fit
+int  strncpy0(char *dest, cchar *source, unsigned int cc);                               //  strncpy, insure null, return 0 if fit
 void strnPad(char *dest, cchar *source, int cc);                                 //  strncpy with blank padding to cc
 int  strTrim(char *dest, cchar *source);                                         //  remove trailing blanks
 int  strTrim(char *string);                                                      //  remove trailing blanks

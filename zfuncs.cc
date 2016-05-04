@@ -249,9 +249,9 @@ namespace zfuncs
 
 //  replacements for malloc(), free(), and strdup() with call counters           //  5.8
 
-void *zmalloc(uint cc)
+void *zmalloc(unsigned int cc)
 {
-   static uint allocated = 0, fwarn = 0;
+   static unsigned int allocated = 0, fwarn = 0;
    double      free, cache;
 
    ///printz("zmalloc %p %d \n",__builtin_return_address(0),cc);
@@ -295,32 +295,6 @@ char *zstrdup(cchar *string, int addcc)
    char *pp = (char *) zmalloc(strlen(string) + 1 + addcc);                      //  bugfix  6.0
    strcpy(pp,string);
    return pp;
-}
-
-void zmalloc_report()
-{
-   using namespace zfuncs;
-
-   static double     ptime = 0;
-   struct mallinfo   memstats;
-   uint32            totmem;
-
-   cchar  *format = " process time: %.2f \n"
-                    " zdialog: %d  open: %d \n"
-                    " zmalloc: %d  zstrdup: %d  zfree: %d  MB: %d \n";
-
-   ptime = jobtime() - ptime;                                                    //  process time - prior value
-
-   memstats = mallinfo();
-   totmem = memstats.uordblks / 1000000;
-
-   printz(format, ptime, zdialog_count, zdialog_busy,
-                  Nmalloc, Nstrdup, Nfree, totmem);
-
-   ptime = jobtime();                                                            //  reset some counters
-   Nmalloc = Nstrdup = Nfree = 0;
-
-   return;
 }
 
 
@@ -377,25 +351,6 @@ void zpopup_message(int secs, cchar *format, ... )                              
 
 /**************************************************************************/
 
-//  produce a backtrace dump to stdout
-
-void zbacktrace()                                                                //  5.9
-{
-   using namespace zfuncs;
-
-   int      nstack = 100;
-   void     *stacklist[100];
-
-   nstack = backtrace(stacklist,nstack);                                         //  get backtrace data
-   if (nstack > 100) nstack = 100;
-   backtrace_symbols_fd(stacklist,nstack,STDOUT_FILENO);                         //  backtrace records to STDOUT
-
-   return;
-}
-
-
-/**************************************************************************/
-
 //  Write an error message and backtrace dump to a file and to a popup window.
 //  Error message works like printf().
 //  Depends on library program addr2line().
@@ -405,135 +360,21 @@ void zappcrash(cchar *format, ... )                                             
    using namespace zfuncs;
 
    static int     crash = 0;
-   struct utsname unbuff;
    va_list        arglist;
-   FILE           *fid1, *fid2, *fid3;
-   int            fd, ii, err, cc, nstack = 100;
-   int            Flinenos = 1;
-   void           *stacklist[100];
-   char           message[300], progexe[300];
-   char           buff1[300], buff2[300], hexaddr[20];
-   char           *arch, *pp1, *pp2, *pfunc;
+   char           message[300];
 
    if (crash++) return;                                                          //  re-entry or multiple threads crash
 
    va_start(arglist,format);
-   vsnprintf(message,300,format,arglist);
+   vsnprintf(message,sizeof(message),format,arglist);
    va_end(arglist);
 
-   uname(&unbuff);
-   arch = unbuff.machine;
+   printz("*** zappcrash: %s %s \n",zappname,message);                   //  output message to stdout
 
-   printz("*** zappcrash: %s %s %s \n",arch,zappname,message);                   //  output message to stdout
-   zbacktrace();                                                                 //  backtrace to stdout
-
-   nstack = backtrace(stacklist,nstack);                                         //  get backtrace data
-   if (nstack <= 0) {
-      printz("*** zappcrash backtrace() failure \n");
-      exit(1);
-   }
-   if (nstack > 100) nstack = 100;
-
-   fid1 = fopen("zbacktrace","w");                                               //  open backtrace data output file
-   if (! fid1) {
-      printz("*** zappcrash fopen() failure \n");
-      exit(1);
-   }
-
-   fd = fileno(fid1);
-   backtrace_symbols_fd(stacklist,nstack,fd);                                    //  write backtrace data
-   fclose(fid1);                                                                 //  (use of malloc() is avoided)
-
-   fid1 = fopen("zbacktrace","r");                                               //  open backtrace data file
-   if (! fid1) {
-      printz("*** zappcrash fopen() failure \n");
-      exit(1);
-   }
-
-   fid2 = fopen("zappcrash","w");                                                //  open zappcrash output file
-   if (! fid2) {
-      printz("*** zappcrash fopen() failure \n");
-      exit(1);
-   }
-
-   fprintf(fid2,"\n*** zappcrash: %s %s %s \n",arch,zappname,message);
-   fprintf(fid2,"*** please send to kornelix@posteo.de *** \n");
-
-   printz("\n*** zappcrash: %s %s %s \n",arch,zappname,message);
-   printz("*** please send to kornelix@posteo.de *** \n");
-
-   cc = readlink("/proc/self/exe",progexe,300);                                  //  get own program path
-   if (cc > 0) progexe[cc] = 0;                                                  //  readlink() quirk
-   else {
-      fprintf(fid2,"progexe not available \n");
-      printz("progexe not available \n");
-      Flinenos = 0;
-   }
-
-   err = system("which addr2line >> /dev/null");                                 //  check if addr2line() available
-   if (err) {
-      fprintf(fid2,"addr2line not available \n");
-      printz("addr2line not available \n");
-      Flinenos = 0;
-   }
-
-   for (ii = 0; ii < nstack; ii++)                                               //  loop backtrace records
-   {
-      fgets_trim(buff1,300,fid1);                                                //  read backtrace line
-      if (! Flinenos) goto output;
-      pfunc = 0;
-      pp1 = strstr(buff1,"[0x");                                                 //  look for hex address [0x.....]
-      if (! pp1) goto output;
-      pp2 = strchr(pp1,']');
-      if (! pp2) goto output;
-      *pp2 = 0;
-      strncpy0(hexaddr,pp1+1,20);
-      *pp2 = ']';
-      snprintf(buff2,300,"addr2line -e %s %s",progexe,hexaddr);                  //  convert to source program
-      fid3 = popen(buff2,"r");                                                   //    and line number
-      if (! fid3) goto output;
-      pfunc = fgets(buff2,300,fid3);
-      pclose(fid3);
-      if (! pfunc) goto output;
-      cc = strlen(pfunc);
-      if (cc < 10) goto output;
-      if (pfunc[cc-1] < ' ') pfunc[cc-1] = 0;                                    //  remove tailing \n if present
-      strncatv(buff1,300,"\n--- ",pfunc,null);
-   output:
-      fprintf(fid2,"%s \n",buff1);                                               //  output
-      printz("%s \n",buff1);                                                     //  6.2
-   }
-
-   fclose(fid2);
-   err = system("xdg-open zappcrash");                                           //  popup zappcrash text file
-   if (err) printz("*** xdg-open failure \n");
-   else err = system("rm zbacktrace");                                           //  delete zbacktrace file
    exit(1);
 }
 
 
-/**************************************************************************/
-
-//  application initialization function to catch some bad news signals
-//  the signal handler calls zappcrash() to output a backtrace dump and exit
-
-void catch_signals()
-{
-   void sighandler(int signal);
-   struct sigaction  sigact;
-
-   sigact.sa_handler = sighandler;
-   sigemptyset(&sigact.sa_mask);
-   sigact.sa_flags = 0;
-
-   sigaction(SIGTERM,&sigact,0);
-   sigaction(SIGSEGV,&sigact,0);
-   sigaction(SIGILL,&sigact,0);
-   sigaction(SIGFPE,&sigact,0);
-   sigaction(SIGBUS,&sigact,0);
-   sigaction(SIGABRT,&sigact,0);                                                 //  heap or stack corruption           5.9
-   return;
-}
 
 
 //  catch fatal signals and produce backtrace dumps on-screen
@@ -758,24 +599,6 @@ double CPUtime()
    return dtime;
 }
 
-
-/**************************************************************************/
-
-//  Get elapsed CPU time used by current process, including all threads.
-//  Returns seconds with millisecond resolution.
-
-double CPUtime2()
-{
-   struct rusage  usage;
-   double         utime, stime;
-   int            err;
-
-   err = getrusage(RUSAGE_SELF,&usage);
-   if (err) return 0.0;
-   utime = usage.ru_utime.tv_sec + 0.000001 * usage.ru_utime.tv_usec;
-   stime = usage.ru_stime.tv_sec + 0.000001 * usage.ru_stime.tv_usec;
-   return utime + stime;
-}
 
 
 /**************************************************************************/
@@ -2033,7 +1856,7 @@ int strParms(int &begin, cchar *input, char *pname, int maxcc, double &pval)
 
 int strHash(cchar *string, int max)
 {
-   uint     hash = 1;
+   unsigned int     hash = 1;
    uchar    byte;
 
    while ((byte = *string++))
@@ -2054,7 +1877,7 @@ int strHash(cchar *string, int max)
 //  truncate if needed. null terminator is always supplied.
 //  Returns 0 if no truncation, 1 if input string was truncated to fit.
 
-int strncpy0(char *dest, cchar *source, uint cc)
+int strncpy0(char *dest, cchar *source, unsigned int cc)
 {
    strncpy(dest,source,cc);
    dest[cc-1] = 0;
@@ -4295,7 +4118,7 @@ void Qtext_close(Qtext *qtext)
 ***/
 
 cchar * get_zprefix() { return zfuncs::zprefix; }                                //  /usr or /home/<userid>
-cchar * get_zuserdir() { return zfuncs::zuserdir; }                              //  /home/user/.appname
+cchar * get_zuserdir() { return zfuncs::zuserdir; }                              //  /home/user/.local/share/appname
 cchar * get_zdatadir() { return zfuncs::zdatadir; }                              //  parameters, icons
 cchar * get_zdocdir()  { return zfuncs::zdocdir;  }                              //  documentation files
 cchar * get_zicondir()  { return zfuncs::zicondir;  }                            //  icon files
@@ -4313,8 +4136,6 @@ int zinitapp(cchar *appname)
    char        *chTnow;
    STATB       statdat;
    FILE        *fid;
-
-   catch_signals();                                                              //  catch segfault, do backtrace
 
    strcpy(zappname,appname);                                                     //  save app name                   5.6
 

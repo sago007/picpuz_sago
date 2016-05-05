@@ -535,36 +535,3 @@ GdkCursor * zmakecursor(cchar *iconfile);                                       
 PIXBUF * gdk_pixbuf_rotate(PIXBUF *, float deg, int alfa = 0);                   //  rotate pixbuf through any angle
 PIXBUF * gdk_pixbuf_stripalpha(PIXBUF *pixbuf);                                  //  strip alpha channel from pixbuf
 PIXBUF * text_pixbuf(cchar *text, cchar *font, int fsize, GtkWidget *);          //  create pixbuf with text using font
-
-/**************************************************************************
-   C++ classes
-***************************************************************************/
-
-//  dynamic string class ==================================================
-
-class xstring
-{
-      static int  tcount;                                                        //  total xstring count
-      static int  tmem;                                                          //  total memory used
-      int         wmi;                                                           //  internal ID
-      int         xcc;                                                           //  actual cc (excl. NULL)
-      int         xmem;                                                          //  memory allocated cc
-      char      * xpp;                                                           //  memory pointer
-   public:
-      xstring(int cc = 0);                                                       //  default constructor
-      xstring(cchar * );                                                         //  string constructor
-      xstring(const xstring &);                                                  //  copy constructor
-      ~xstring();                                                                //  destructor
-      operator cchar * () const { return xpp; }                                  //  conversion operator (cchar *)
-      xstring operator= (const xstring &);                                       //  operator =
-      xstring operator= (cchar *);                                               //  operator =
-      friend xstring operator+ (const xstring &, const xstring &);               //  operator +
-      friend xstring operator+ (const xstring &, cchar *);                       //  operator +
-      friend xstring operator+ (cchar *, const xstring &);                       //  operator +
-      void insert(int pos, cchar * string, int cc = 0);                          //  insert substring at position (expand)
-      void overlay(int pos, cchar * string, int cc = 0);                         //  overlay substring (possibly expand)
-      static void getStats(int & tcount2, int & tmem2);                          //  get statistics
-      void validate() const;                                                     //  verify integrity
-      int getcc() const { return xcc; }                                          //  return string length
-};
-

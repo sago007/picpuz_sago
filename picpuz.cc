@@ -69,7 +69,7 @@ struct tileposn_t {
 vector<tileposn_t>   wposn;                                                         //  window position of home tile
 vector<tileposn_t>   hposn;                                                         //  home position of window tile
 
-void m_open(const char *file);                                                         //  open image for new puzzle
+void m_open(const string& file);                                                         //  open image for new puzzle
 void m_tile();                                                                   //  set new tile size
 void m_mix();                                                                    //  mix-up pizzle tiles
 void m_show();                                                                   //  show reference image
@@ -188,7 +188,7 @@ int gtkinitfunc(void *)
 		  p = clfile;                                                 //  use clfile
 	  } 
 
-      m_open(p.c_str());                                                                //  open command line file
+      m_open(p);                                                                //  open command line file
    }
 
    return 0;
@@ -211,7 +211,7 @@ void winpaint(GtkWidget *, cairo_t *cr)
 
 void menufunc(GtkWidget *, const char *menu)
 {
-   if (strmatch(menu,"open")) m_open(0);
+   if (strmatch(menu,"open")) m_open("");
    if (strmatch(menu,"tile")) m_tile();
    if (strmatch(menu,"mix")) m_mix();
    if (strmatch(menu,"show")) m_show();
@@ -227,16 +227,16 @@ void menufunc(GtkWidget *, const char *menu)
 
 //  create a new puzzle from an image file
 
-void m_open(const char *file)
+void m_open(const std::string& file)
 {
    std::string newfile;
 
-   if (file && strmatch(file,"F1")) return;                                      //  context help     v.2.1
+   if (file == "F1") return;                                      //  context help     v.2.1
 
    if (puzzle_status()) return;                                                  //  do not discard
    clear_puzzle();
 
-   if (file) {
+   if (file.length()) {
 	   newfile = file;
    }
    else {

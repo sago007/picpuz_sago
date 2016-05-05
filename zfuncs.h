@@ -239,25 +239,10 @@ double drandz();                                                                
 void spline1(int nn, float *dx, float *dy);                                      //  define a curve using nn data points
 float spline2(float x);                                                          //  return y-value for given x-value
 
-//  FIFO queue for text strings, single or dual-thread access =============                                       v.5.7
-
-typedef struct  {
-   int      qcap;                                                                //  queue capacity
-   int      qnewest;                                                             //  newest entry position, circular
-   int      qoldest;                                                             //  oldest entry position, circular
-   int      qdone;                                                               //  flag, last entry added to queue
-   char     **qtext;                                                             //  up to qcap text strings
-}  Qtext;
-
-void Qtext_open(Qtext *qtext, int cap);                                          //  initialize Qtext queue, empty
-void Qtext_put(Qtext *qtext, cchar *format, ...);                                //  add text string to Qtext queue
-char * Qtext_get(Qtext *qtext);                                                  //  remove text string from Qtext queue
-void Qtext_close(Qtext *qtext);                                                  //  close Qtext, zfree() leftover strings
-
 //  application initialization and administration =========================
 
 int zinitapp(cchar *appname);                                                    //  initz. app directories and files   v.4.1
-cchar * get_zprefix();                                                           //  get /usr or /usr/local  ...        v.4.1
+const std::string& get_zprefix();                                                           //  get /usr or /usr/local  ...        v.4.1
 cchar * get_zuserdir();                                                          //  get /home/user/.appname/
 cchar * get_zdatadir();                                                          //  get data directory
 cchar * get_zdocdir();                                                           //  get document directory

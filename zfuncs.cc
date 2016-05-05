@@ -224,7 +224,8 @@ namespace zfuncs
    GdkDevice         *mouse;                                                     //  pointer device
    GtkSettings       *settings;                                                  //  screen settings                    6.2
    std::string        zappname;                                                     //  app name/version
-   char        zprefix[200], zdatadir[200], zdocdir[200];                        //  app directories
+   std::string		zprefix;
+   char        zdatadir[200], zdocdir[200];                        //  app directories
    char        zicondir[200], zlocalesdir[200], zuserdir[200];
    char        zlang[8] = "en";                                                  //  "lc" or "lc_RC"
    char        JPGquality[4] = "90";                                             //  JPG file save quality
@@ -3684,85 +3685,6 @@ float  spline2(float x)
    return y;
 }
 
-
-/**************************************************************************/
-
-//  Add text strings to a FIFO queue, retrieve text strings.                     //  5.7
-//  Can be used by one or two threads.
-//  thread 1: open queue, get strings, close queue.
-//  thread 2: put strings into queue.
-
-
-//  create and initialize Qtext queue, empty status
-
-void Qtext_open(Qtext *qtext, int cap)
-{
-   int      cc;
-
-   qtext->qcap = cap;
-   qtext->qnewest = -1;
-   qtext->qoldest = -1;
-   qtext->qdone = 0;
-   cc = cap * sizeof(char *);
-   qtext->qtext = (char **) zmalloc(cc);
-   memset(qtext->qtext,0,cc);
-   return;
-}
-
-
-//  add new text string to Qtext queue
-//  if queue full, sleep until space is available
-
-void Qtext_put(Qtext *qtext, cchar *format, ...)
-{
-   int      qnext;
-   va_list  arglist;
-   char     message[200];
-
-   va_start(arglist,format);
-   vsnprintf(message,199,format,arglist);
-   va_end(arglist);
-
-   qnext = qtext->qnewest + 1;
-   if (qnext == qtext->qcap) qnext = 0;
-   while (qtext->qtext[qnext]) zsleep(0.01);
-   qtext->qtext[qnext] = zstrdup(message);
-   qtext->qnewest = qnext;
-   return;
-}
-
-
-//  remove oldest text string from Qtext queue
-//  if queue empty, return a null string
-
-char * Qtext_get(Qtext *qtext)
-{
-   int      qnext;
-   char     *text;
-
-   if (qtext->qcap == 0) return 0;
-   qnext = qtext->qoldest + 1;
-   if (qnext == qtext->qcap) qnext = 0;
-   text = qtext->qtext[qnext];
-   if (! text) return 0;
-   qtext->qtext[qnext] = 0;
-   qtext->qoldest = qnext;
-   return text;
-}
-
-
-//  close Qtext, zfree() any leftover strings
-
-void Qtext_close(Qtext *qtext)
-{
-   for (int ii = 0; ii < qtext->qcap; ii++)
-      if (qtext->qtext[ii]) zfree(qtext->qtext[ii]);
-   zfree(qtext->qtext);                                                          //  6.0
-   qtext->qcap = 0;
-   return;
-}
-
-
 /**************************************************************************
 
    Initialize application files according to following conventions:              //  new version
@@ -3802,7 +3724,7 @@ void Qtext_close(Qtext *qtext)
 
 ***/
 
-cchar * get_zprefix() { return zfuncs::zprefix; }                                //  /usr or /home/<userid>
+const std::string& get_zprefix() { return zfuncs::zprefix; }                                //  /usr or /home/<userid>
 cchar * get_zuserdir() { return zfuncs::zuserdir; }                              //  /home/user/.local/share/appname
 cchar * get_zdatadir() { return zfuncs::zdatadir; }                              //  parameters, icons
 cchar * get_zdocdir()  { return zfuncs::zdocdir;  }                              //  documentation files
@@ -3814,7 +3736,7 @@ int zinitapp(cchar *appname)
 {
    using namespace zfuncs;
 
-   char        work[200];
+   std::string work;
    char        logfile[200], oldlog[200];
    int         cc, secs, err;
    time_t      Tnow;
@@ -3828,12 +3750,12 @@ int zinitapp(cchar *appname)
       #define PREFIX "/usr"
    #endif
 
-   strncpy0(work,PREFIX,199);                                                    //  /usr or /home/<userid>
-   strcpy(zprefix,work);                                                         //  /prefix
-   strncatv(zdatadir,199,work,"/share/",zappname.c_str(),"/data",null);                  //  /prefix/share/appname/data
-   strncatv(zicondir,199,work,"/share/",zappname.c_str(),"/icons",null);                 //  /prefix/share/appname/icons
-   strncatv(zlocalesdir,199,work,"/share/",zappname.c_str(),"/locales",null);            //  /prefix/share/appname/locales
-   strncatv(zdocdir,199,work,"/share/doc/",zappname.c_str(),null);                       //  /prefix/share/doc/appname
+   work = PREFIX;                                                    //  /usr or /home/<userid>
+   zprefix = work;                                                         //  /prefix
+   strncatv(zdatadir,199,work.c_str(),"/share/",zappname.c_str(),"/data",null);                  //  /prefix/share/appname/data
+   strncatv(zicondir,199,work.c_str(),"/share/",zappname.c_str(),"/icons",null);                 //  /prefix/share/appname/icons
+   strncatv(zlocalesdir,199,work.c_str(),"/share/",zappname.c_str(),"/locales",null);            //  /prefix/share/appname/locales
+   strncatv(zdocdir,199,work.c_str(),"/share/doc/",zappname.c_str(),null);                       //  /prefix/share/doc/appname
 
    #ifdef DOCDIR
       strncpy0(zdocdir,DOCDIR,199);                                              //  flexible DOCDIR location
@@ -4124,7 +4046,7 @@ void zmake_menu_launcher(cchar *command, cchar *categories, cchar *genericname)
    fputs(work,fid);
    fputs("Type=Application\n",fid);                                              //  Type=Application
    fputs("Terminal=false\n",fid);                                                //  Terminal=false
-   snprintf(work,199,"Exec=%s/bin/%s\n",zprefix,command);                        //  Exec=/usr/bin/appname -options
+   snprintf(work,199,"Exec=%s/bin/%s\n",zprefix.c_str(),command);                        //  Exec=/usr/bin/appname -options
    fputs(work,fid);
    snprintf(work,199,"Icon=%s/%s.png\n",zicondir,appname);                       //  /usr/share/appname/icons/appname.png
    fputs(work,fid);

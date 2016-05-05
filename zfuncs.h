@@ -85,17 +85,6 @@ void zsleep(double dsecs);                                                      
 int shell_ack(cchar *command, ...);                                              //   ""  + popup an error message if error
 char * fgets_trim(char * buff, int maxcc, FILE *, int bf = 0);                   //  fgets + trim trailing \n \r (blanks)
 
-//  measure CPU time spent in a function or code block within a function
-
-extern volatile double cpu_profile_timer;                                        //  internal data tables
-extern volatile double cpu_profile_table[100];
-extern volatile double cpu_profile_elapsed;
-void cpu_profile_init();                                                         //  initialize at start of test
-void cpu_profile_report();                                                       //  report CPU time per function
-inline void cpu_profile_enter(int fnum)                                          //  at entry to measured code block
-{  cpu_profile_timer = cpu_profile_elapsed;  }
-inline void cpu_profile_exit(int fnum)                                           //  at exit from measured code block
-{  cpu_profile_table[fnum] += cpu_profile_elapsed - cpu_profile_timer; }
 
 //  string macros and functions ===========================================
 

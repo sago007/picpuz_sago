@@ -38,12 +38,11 @@ static void zpopup_message(int secs, cchar *format, ...);                       
 
 static void zappcrash(cchar *format, ...);                                              //  crash with popup message in text window
 
-
-static void start_detached_thread(void * tfunc(void *), void * arg);                    //  start detached thread function
 static int shell_quiet(cchar *command, ...);                                            //  format/run shell command, return status
 
 static char * command_output(int &contx, cchar *command, ...);                          //  get shell command output
 static int command_status(int contx);                                                   //  get exit status of command
+
 
 
 /**************************************************************************
@@ -80,7 +79,6 @@ static int command_status(int contx);                                           
    samedirk                test if two files/directories have the same directory path
    parsefile               parse filespec into directory, file, extension
    check_create_dir        check if directory exists, ask to create if not
-   cpu_profile             measure CPU time spent per function or code block
    pagefaultrate           monitor and report own process hard page fault rate
 
    String Functions
@@ -536,27 +534,6 @@ void zsleep(double dsecs)
 
 
 
-/**************************************************************************/
-
-//  Start a detached thread using a simplified protocol.
-//  Will not make a zombie out of the calling thread if it exits
-//  without checking the status of the created thread.
-//  Thread should exit with pthread_exit(0);
-
-void start_detached_thread(void * threadfunc(void *), void * arg)
-{
-   pthread_t         ptid;
-   pthread_attr_t    ptattr;
-   int               pterr;
-
-   pthread_attr_init(&ptattr);
-   pthread_attr_setdetachstate(&ptattr,PTHREAD_CREATE_DETACHED);
-   pterr = pthread_create(&ptid,&ptattr,threadfunc,arg);
-   if (pterr) zappcrash("start_detached_thread() failure");
-   return;
-}
-
-
 
 /**************************************************************************/
 
@@ -769,81 +746,6 @@ char * fgets_trim(char *buff, int maxcc, FILE *fid, int bf)
 }
 
 
-
-/**************************************************************************
-
-   utility to measure CPU time spent in various functions or code blocks
-
-   cpu_profile_init()            initialize at start of test
-   cpu_profile_enter(fnum)       at entry to a function
-   cpu_profile_exit(fnum)        at exit from a function
-   cpu_profile_report()          report CPU time per function
-
-   Methodology: cpu_profile_init() starts a thread that suspends and runs every
-   1 millisecond and updates a timer.
-   cpu_profile_enter() and cpu_profile_exit() accumulate the time difference between
-   entry and exit of code being measured. This may be zero because of the long interval
-   between timer updates. Accuracy comes from statistical sampling over many seconds,
-   so that if the time spent in a monitored function is significant, it will be accounted
-   for. The accuracy is better than 1% as long as the measured function or code block
-   consumes a second or more of CPU time during the measurement period.
-   The "fnum" argument (1-99) designates the function or code block being measured.
-   cpu_profile_report() stops the timer thread and reports time consumed per function,
-   using the "fnum" tags in the report.
-   The functions cpu_profile_enter() and cpu_profile_exit() subtract the timer
-   difference and add to a counter per fnum, so the added overhead is insignificant.
-   They are inline functions defined as follows:
-   enter:  cpu_profile_timer = cpu_profile_elapsed;
-   exit:   cpu_profile_table[fnum] += cpu_profile_elapsed - cpu_profile_timer;
-
-***************************************************************************/
-
-volatile double   cpu_profile_table[100];
-volatile double   cpu_profile_timer;
-volatile double   cpu_profile_elapsed;
-volatile int      cpu_profile_kill = 0;
-
-void cpu_profile_init()
-{
-   void *   cpu_profile_timekeeper(void *);
-
-   for (int ii = 0; ii < 99; ii++)
-      cpu_profile_table[ii] = 0;
-   cpu_profile_elapsed = 0;
-   start_detached_thread(cpu_profile_timekeeper,nullptr);
-}
-
-void cpu_profile_report()
-{
-   cpu_profile_kill++;
-
-   printz("elapsed: %.2f \n",cpu_profile_elapsed);
-
-   for (int ii = 0; ii < 100; ii++)
-   {
-      double dtime = cpu_profile_table[ii];
-      if (dtime) printz("cpu profile func: %d  time: %.2f \n",ii,dtime);
-   }
-}
-
-void * cpu_profile_timekeeper(void *)
-{
-   timeval  time0, time1;
-
-   gettimeofday(&time0,0);
-
-   while (true)
-   {
-      gettimeofday(&time1,0);
-      cpu_profile_elapsed = time1.tv_sec - time0.tv_sec
-              + 0.000001 * (time1.tv_usec - time0.tv_usec);
-      zsleep(0.001);
-      if (cpu_profile_kill) break;
-   }
-
-   cpu_profile_kill = 0;
-   pthread_exit(0);
-}
 
 
 /**************************************************************************

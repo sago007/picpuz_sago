@@ -119,7 +119,6 @@ int runroot(cchar *sucomm, cchar *command);                                     
 char * fgets_trim(char * buff, int maxcc, FILE *, int bf = 0);                   //  fgets + trim trailing \n \r (blanks)
 int samedirk(cchar *file1, cchar *file2);                                        //  returns 1 if files in same directory
 int parsefile(cchar *path, char **dir, char **file, char **ext);                 //  parse a filespec
-int renamez(cchar *file1, cchar *file2);                                         //  rename, also across file systems
 int check_create_dir(const char *path);                                                //  check if directory exists, ask to create
 
 //  measure CPU time spent in a function or code block within a function

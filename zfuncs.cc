@@ -61,7 +61,6 @@
    fgets_trim              fgets() with trim of trailing \r \n and optionally blanks
    samedirk                test if two files/directories have the same directory path
    parsefile               parse filespec into directory, file, extension
-   renamez                 like rename() but works across file systems
    check_create_dir        check if directory exists, ask to create if not
    cpu_profile             measure CPU time spent per function or code block
    pagefaultrate           monitor and report own process hard page fault rate
@@ -1187,38 +1186,6 @@ int parsefile(cchar *ppath, char **pdirk, char **pfile, char **pext)
    *pext = ext;
    *pp = 0;                                                                      //  remove from file part
    return 0;
-}
-
-
-/**************************************************************************/
-
-//  Move a source file to a destination file and delete the source file.
-//  Equivalent to rename(), but the two files MAY be on different file systems.
-//  Pathnames must be absolute (start with '/').
-//  Returns 0 if OK, +N if not.
-
-int renamez(cchar *file1, cchar *file2)                                          //  5.8
-{
-   const char     *pp1;
-   const char     *pp2;
-   int      err, Frename = 0;
-
-   if (*file1 != '/' || *file2 != '/') return 1;                                 //  not absolute pathnames
-
-   pp1 = strchr((char *) file1+1,'/');
-   pp2 = strchr((char *) file2+1,'/');
-   if (! pp1 || ! pp2) return 2;
-
-   if (strmatch(file1,file2)) Frename = 1;
-
-   if (Frename) {                                                                //  same top directory
-      err = rename(file1,file2);
-      if (err) return errno;
-      else return 0;
-   }
-
-   err = shell_quiet("mv -f %s %s",file1,file2);                                 //  not
-   return err;
 }
 
 

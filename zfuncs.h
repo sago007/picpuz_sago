@@ -207,25 +207,12 @@ void HeapSort(char *recs, int RL, int NR, HeapSortUcomp);                       
 
 int MemSort(char * RECS, int RL, int NR, int KEYS[][3], int NK);                 //  memory sort, records with multiple keys
 
-//  variable string list functions ========================================
 
 struct  pvlist {
    int      max;                          //  max. entries
    int      act;                          //  actual entries
    char   **list;                         //  entries
 };
-
-pvlist * pvlist_create(int max);                                                 //  create pvlist
-void pvlist_free(pvlist *pv);                                                    //  free pvlist
-int pvlist_append(pvlist *pv, cchar *entry, int unique = 0);                     //  append new entry (opt. if unique)
-int pvlist_prepend(pvlist *pv, cchar *entry, int unique = 0);                    //  prepend new entry (opt. if unique)
-int pvlist_find(pvlist *pv, cchar *entry);                                       //  find entry by name
-int pvlist_remove(pvlist *pv, cchar *entry);                                     //  remove entry by name
-int pvlist_remove(pvlist *pv, int Nth);                                          //  remove entry by number (0...)
-int pvlist_count(pvlist *pv);                                                    //  return entry count
-int pvlist_replace(pvlist *pv, int Nth, cchar *entry);                           //  replace Nth entry (0...)
-char * pvlist_get(pvlist *pv, int Nth);                                          //  return Nth entry (0...)
-int pvlist_sort(pvlist *pv);                                                     //  sort list, ascending
 
 //  random number functions ===============================================
 

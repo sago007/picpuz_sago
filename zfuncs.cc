@@ -3423,7 +3423,19 @@ int MemSortComp(cchar *rec1, cchar *rec2)
 //  Memory is allocated for max pointers at first. Memory for the strings is
 //  allocated and freed as the strings are added or removed.
 
-pvlist * pvlist_create(int max)
+//  variable string list functions ========================================
+
+
+static pvlist * pvlist_create(int max);                                                 //  create pvlist
+static void pvlist_free(pvlist *pv);                                                    //  free pvlist
+static int pvlist_append(pvlist *pv, cchar *entry, int unique = 0);                     //  append new entry (opt. if unique)
+static int pvlist_prepend(pvlist *pv, cchar *entry, int unique = 0);                    //  prepend new entry (opt. if unique)
+static int pvlist_find(pvlist *pv, cchar *entry);                                       //  find entry by name
+static int pvlist_remove(pvlist *pv, int Nth);                                          //  remove entry by number (0...)
+static int pvlist_count(pvlist *pv);                                                    //  return entry count
+static char * pvlist_get(pvlist *pv, int Nth);                                          //  return Nth entry (0...)
+
+static pvlist * pvlist_create(int max)
 {
    pvlist      *pv;
 
@@ -3437,7 +3449,7 @@ pvlist * pvlist_create(int max)
 
 //  free memory for variable list and contained strings
 
-void pvlist_free(pvlist *pv)
+static void pvlist_free(pvlist *pv)
 {
    int      ii;
 
@@ -3453,7 +3465,7 @@ void pvlist_free(pvlist *pv)
 //  return: N >= 0: new entry added at position N
 //          N = -1: not unique, not added
 
-int pvlist_append(pvlist *pv, cchar *entry, int unique)
+static int pvlist_append(pvlist *pv, cchar *entry, int unique)
 {
    int      ii;
 
@@ -3474,7 +3486,7 @@ int pvlist_append(pvlist *pv, cchar *entry, int unique)
 //  return: N = 0: new entry added at position 0
 //          N = -1: not unique, not added
 
-int pvlist_prepend(pvlist *pv, cchar *entry, int unique)
+static int pvlist_prepend(pvlist *pv, cchar *entry, int unique)
 {
    int      ii;
 
@@ -3493,7 +3505,7 @@ int pvlist_prepend(pvlist *pv, cchar *entry, int unique)
 //  find list entry by name, return entry (0 based)
 //  return -1 if not found
 
-int pvlist_find(pvlist *pv, cchar *entry)
+static int pvlist_find(pvlist *pv, cchar *entry)
 {
    int      ii;
 
@@ -3504,24 +3516,11 @@ int pvlist_find(pvlist *pv, cchar *entry)
 }
 
 
-//  remove an entry by name and repack list
-//  return (former) entry or -1 if not found
-
-int pvlist_remove(pvlist *pv, cchar *entry)
-{
-   int      ii;
-
-   ii = pvlist_find(pv,entry);
-   if (ii < 0) return -1;
-   pvlist_remove(pv,ii);
-   return ii;
-}
-
 
 //  remove an entry by number and repack list
 //  returns -1 if entry is beyond list end
 
-int pvlist_remove(pvlist *pv, int ii)
+static int pvlist_remove(pvlist *pv, int ii)
 {
    if (ii < 0 || ii >= pv->act) return -1;
    zfree(pv->list[ii]);
@@ -3536,38 +3535,18 @@ int pvlist_remove(pvlist *pv, int ii)
 
 //  return entry count
 
-int pvlist_count(pvlist *pv)
+static int pvlist_count(pvlist *pv)
 {
    return pv->act;
 }
 
 
-//  replace Nth entry with new one
-
-int pvlist_replace(pvlist * pv, int ii, cchar *entry)
-{
-   if (ii < 0 || ii >= pv->act) return -1;
-   zfree(pv->list[ii]);
-   pv->list[ii] = zstrdup(entry);
-   return 0;
-}
-
-
 //  return Nth entry or null
 
-char * pvlist_get(pvlist *pv, int Nth)
+static char * pvlist_get(pvlist *pv, int Nth)
 {
    if (Nth >= pv->act) return 0;
    return pv->list[Nth];
-}
-
-
-//  sort list in ascending order
-
-int pvlist_sort(pvlist *pv)
-{
-   HeapSort(pv->list,pv->act);
-   return 0;
 }
 
 

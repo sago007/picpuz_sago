@@ -229,17 +229,19 @@ void menufunc(GtkWidget *, const char *menu)
 
 void m_open(const char *file)
 {
-   char        *newfile = 0;
+   std::string newfile;
 
    if (file && strmatch(file,"F1")) return;                                      //  context help     v.2.1
 
    if (puzzle_status()) return;                                                  //  do not discard
    clear_puzzle();
 
-   if (file) newfile = strdup(file);
-   if (! newfile) {
+   if (file) {
+	   newfile = file;
+   }
+   else {
       newfile = zgetfile(ZTX("select image file"),MWIN,"file",imagedirk.c_str());
-      if (! newfile) return;
+      if (newfile.empty()) return;
    }
 
    imagefile = newfile;
@@ -385,7 +387,7 @@ void win2_destroy()
 void m_save()
 {
    FILE           *fid;
-   char           *sfile;
+   std::string    sfile;
    int            ii, row, col;
    string           savefile;                                                //  saved puzzle file name
 
@@ -394,12 +396,11 @@ void m_save()
    savefile = string(get_zuserdir())+"/"+pname+".puz";
 
    sfile = zgetfile(ZTX("save puzzle to a file"),MWIN,"save",savefile.c_str());
-   if (! sfile) return;
+   if (sfile.empty()) return;
 
-   fid = fopen(sfile,"w");
+   fid = fopen(sfile.c_str(), "w");
    if (! fid) {
-      zmessageACK(win1,ZTX("cannot open: %s"),sfile);
-      free(sfile);
+      zmessageACK(win1,ZTX("cannot open: %s"),sfile.c_str());
       return;
    }
 
@@ -416,7 +417,6 @@ void m_save()
    }
 
    fclose(fid);
-   free(sfile);
 
    Nmoves = 0;                                                                   //  reset move count
    return;
@@ -429,24 +429,24 @@ void m_resume()
 {
    FILE        *fid;
    int         stat, row1, col1, row2, col2, ii;
-   char        *newfile = 0, *pp;
+   string      newfile;
+   char        *pp;
 
    if (puzzle_status()) return;                                                  //  do not discard
    clear_puzzle();
 
    newfile = zgetfile(ZTX("load puzzle from file"),MWIN,"file",get_zuserdir());
-   if (! newfile) return;
+   if (newfile.empty()) return;
 
-   fid = fopen(newfile,"r");
+   fid = fopen(newfile.c_str(),"r");
    if (! fid) {
-      zmessageACK(win1,ZTX("cannot open: %s"),newfile);
-      free(newfile);
+      zmessageACK(win1,ZTX("cannot open: %s"),newfile.c_str());
       return;
    }
 
-   free(newfile);
    newfile = (char *) malloc(XFCC);
-   pp = fgets_trim(newfile,XFCC-1,fid,1);                                        //  read image file name
+   newfile.resize(XFCC);
+   pp = fgets_trim(&newfile[0],newfile.length(), fid, 1);                                        //  read image file name
    if (! pp) goto badfile;
 
    imagefile = newfile;

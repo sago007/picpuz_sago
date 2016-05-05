@@ -39,6 +39,7 @@
 #include <signal.h>
 #include <locale.h>
 #include <gtk/gtk.h>
+#include <string>
 
 #define VERTICAL GTK_ORIENTATION_VERTICAL                                        //  GTK shortcuts
 #define HORIZONTAL GTK_ORIENTATION_HORIZONTAL
@@ -312,7 +313,7 @@ void wscroll(GtkWidget *mLog, int line);                                        
 void wclear(GtkWidget *Win);                                                     //  clear window
 void wclear(GtkWidget *Win, int line);                                           //  clear from line to end
 char * wscanf(GtkWidget *Win, int &ftf);                                         //  get text lines from edit widget
-int  wfiledump(GtkWidget *Win, char *filespec);                                  //  dump text window to file
+int  wfiledump(GtkWidget *Win, const char *filespec);                                  //  dump text window to file
 void wfilesave(GtkWidget *Win, GtkWindow *parent);                               //  wfiledump() via file-chooser dialog
 void wprintp(GtkWidget *Win);                                                    //  print text window to default printer
 
@@ -516,7 +517,7 @@ int  popup_image(cchar *imagefile, GtkWindow *parent, int Fnewin, int size);    
 
 //  file chooser dialogs for one file or multiple files
 
-char  * zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
+std::string zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
 char ** zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
 
 //  print an image file, choosing printer, paper, orientation, margins, and scale

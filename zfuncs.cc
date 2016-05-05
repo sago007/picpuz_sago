@@ -5106,7 +5106,7 @@ char * wscanf(GtkWidget *mLog, int & ftf)
 
 int   wfiledump_maxcc = 0;
 
-int wfiledump(GtkWidget *mLog, char *filespec)
+int wfiledump(GtkWidget *mLog, const char *filespec)
 {
    FILE        *fid;
    char        *prec;
@@ -5148,15 +5148,14 @@ int wfiledump(GtkWidget *mLog, char *filespec)
 void wfilesave(GtkWidget *mLog, GtkWindow *parent)
 {
    int         err;
-   char        *file;
+   std::string file;
 
    if (! mLog) return;
 
    file = zgetfile(ZTX("save screen to file"),parent,"save","screen-save.txt");
-   if (! file) return;
-   err = wfiledump(mLog,file);
+   if (file.empty()) return;
+   err = wfiledump(mLog,file.c_str());
    if (err) zmessageACK(0,"save screen failed (%d)",err);
-   zfree(file);
    return;
 }
 
@@ -6262,14 +6261,14 @@ int gmenuznames::edit_menu_event(zdialog *zd, cchar *event)
    using namespace gmenuznames;
 
    char        text[maxText];
-   char        *iconfile;
+   std::string iconfile;
    int         size;
    PIXBUF      *pixbuf;
    GError      *gerror;
 
    if (strmatch(event,"browse")) {                                               //  browse for icon file
       iconfile = zgetfile("select icon",null,"file",0);
-      if (iconfile) zdialog_stuff(zd,"icon",iconfile);
+      if (iconfile.length() > 0) zdialog_stuff(zd,"icon",iconfile.c_str());
    }
 
    if (zd->zstat)                                                                //  dialog complete
@@ -9784,14 +9783,14 @@ int popup_image_KBevent(GtkWidget *window, GdkEventKey *event, cchar *file)
 //  returns one filespec or null
 //  returned file is subject for zfree()
 
-char * zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *initfile, int hidden)
+std::string zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *initfile, int hidden)
 {
    if (! strmatchV(action,"file","save","folder","create folder",null))
       zappcrash("zgetfile() call error: %s",action);
 
    char **flist = zgetfiles(title,parent,action,initfile,hidden);                //  parent added   6.1
    if (! flist) return 0;
-   char *file = *flist;
+   std::string file = *flist;
    zfree(flist);
    return file;
 }

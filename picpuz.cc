@@ -66,8 +66,8 @@ int         linecolor = 0;                                                      
 struct tileposn_t {
    int      row, col;                                                            //  map tile position
 };
-tileposn_t   *wposn = 0;                                                         //  window position of home tile
-tileposn_t   *hposn = 0;                                                         //  home position of window tile
+vector<tileposn_t>   wposn;                                                         //  window position of home tile
+vector<tileposn_t>   hposn;                                                         //  home position of window tile
 
 void m_open(const char *file);                                                         //  open image for new puzzle
 void m_tile();                                                                   //  set new tile size
@@ -443,7 +443,6 @@ void m_resume()
       return;
    }
 
-   newfile = (char *) malloc(XFCC);
    newfile.resize(XFCC);
    const char* pp = fgets_trim(&newfile[0],newfile.length(), fid, 1);                                        //  read image file name
    if (! pp) goto badfile;
@@ -457,8 +456,8 @@ void m_resume()
    if (stat != 2) goto badfile;
    if (Ntiles != Nrows * Ncols) goto badfile;
 
-   if (wposn) delete [] wposn;
-   wposn = new tileposn_t[Ntiles];
+   wposn.clear();
+   wposn.resize(Ntiles);
 
    for (row1 = 0; row1 < Nrows; row1++) {                                        //  read tile position data
       for (col1 = 0; col1 < Ncols; col1++) {
@@ -657,20 +656,21 @@ void tile_window(int newp)
       Ntiles = Nrows * Ncols;
       Nhome = Ntiles;
 
-      if (wposn) delete [] wposn;                                                //  new window position map
-      wposn = new tileposn_t[Ntiles];
+	  wposn.clear();
+	  wposn.resize(Ntiles);
 
-      for (row = 0; row < Nrows; row++)
-      for (col = 0; col < Ncols; col++)
-      {
-         ii = Tindex(row,col);                                                   //  all window positions = home
-         wposn[ii].row = row;
-         wposn[ii].col = col;
-      }
+      for (row = 0; row < Nrows; row++) {
+		for (col = 0; col < Ncols; col++)
+		{
+		   ii = Tindex(row,col);                                                   //  all window positions = home
+		   wposn[ii].row = row;
+		   wposn[ii].col = col;
+		}
+	  }
    }
 
-   if (hposn) delete [] hposn;                                                   //  new home position map
-   hposn = new tileposn_t[Ntiles];
+   hposn.clear();
+   hposn.resize(Ntiles);
 
    for (row = 0; row < Nrows; row++)                                             //  initialize home position map
    for (col = 0; col < Ncols; col++)                                             //    from window position map
@@ -691,16 +691,20 @@ void tile_window(int newp)
    wPixbuf = gdk_pixbuf_scale_simple(iPixbuf,winW,winH,interp);                  //  scale image to window size
 
    if (mwcr) {
-      for (row = 0; row < Nrows; row++)                                          //  draw tile pixmaps on window
-      for (col = 0; col < Ncols; col++)
-         draw_tile(row,col);
+      for (row = 0; row < Nrows; row++) {                                          //  draw tile pixmaps on window
+		for (col = 0; col < Ncols; col++) {
+		   draw_tile(row,col);
+		}
+	  }
    }
    else {
       mwcr = gdk_cairo_create(gtk_widget_get_window(dwin1));                     //  gtk3
       cairo_set_line_width(mwcr,1);
-      for (row = 0; row < Nrows; row++)
-      for (col = 0; col < Ncols; col++)
-         draw_tile(row,col);
+      for (row = 0; row < Nrows; row++) {
+		for (col = 0; col < Ncols; col++) {
+		   draw_tile(row,col);
+		}
+	  }
       cairo_destroy(mwcr);
       mwcr = 0;
    }

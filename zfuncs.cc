@@ -224,7 +224,7 @@ namespace zfuncs
    GdkScreen         *screen;                                                    //  monitor
    GdkDevice         *mouse;                                                     //  pointer device
    GtkSettings       *settings;                                                  //  screen settings                    6.2
-   char        zappname[20];                                                     //  app name/version
+   std::string        zappname;                                                     //  app name/version
    char        zprefix[200], zdatadir[200], zdocdir[200];                        //  app directories
    char        zicondir[200], zlocalesdir[200], zuserdir[200];
    char        zlang[8] = "en";                                                  //  "lc" or "lc_RC"
@@ -367,7 +367,7 @@ void zappcrash(cchar *format, ... )                                             
    vsnprintf(message,sizeof(message),format,arglist);
    va_end(arglist);
 
-   printz("*** zappcrash: %s %s \n",zappname,message);                   //  output message to stdout
+   printz("*** zappcrash: %s %s \n",zappname.c_str(),message);                   //  output message to stdout
 
    exit(1);
 }
@@ -4019,7 +4019,7 @@ int zinitapp(cchar *appname)
    STATB       statdat;
    FILE        *fid;
 
-   strcpy(zappname,appname);                                                     //  save app name                   5.6
+   zappname = appname;                                                     //  save app name                   5.6
 
    #ifndef PREFIX                                                                //  install location
       #define PREFIX "/usr"
@@ -4027,10 +4027,10 @@ int zinitapp(cchar *appname)
 
    strncpy0(work,PREFIX,199);                                                    //  /usr or /home/<userid>
    strcpy(zprefix,work);                                                         //  /prefix
-   strncatv(zdatadir,199,work,"/share/",zappname,"/data",null);                  //  /prefix/share/appname/data
-   strncatv(zicondir,199,work,"/share/",zappname,"/icons",null);                 //  /prefix/share/appname/icons
-   strncatv(zlocalesdir,199,work,"/share/",zappname,"/locales",null);            //  /prefix/share/appname/locales
-   strncatv(zdocdir,199,work,"/share/doc/",zappname,null);                       //  /prefix/share/doc/appname
+   strncatv(zdatadir,199,work,"/share/",zappname.c_str(),"/data",null);                  //  /prefix/share/appname/data
+   strncatv(zicondir,199,work,"/share/",zappname.c_str(),"/icons",null);                 //  /prefix/share/appname/icons
+   strncatv(zlocalesdir,199,work,"/share/",zappname.c_str(),"/locales",null);            //  /prefix/share/appname/locales
+   strncatv(zdocdir,199,work,"/share/doc/",zappname.c_str(),null);                       //  /prefix/share/doc/appname
 
    #ifdef DOCDIR
       strncpy0(zdocdir,DOCDIR,199);                                              //  flexible DOCDIR location
@@ -4043,10 +4043,10 @@ int zinitapp(cchar *appname)
    const char *xdg_data_dir = getenv("XDG_DATA_HOME"); 
 	  
    if (xdg_data_dir) {
-      snprintf(zuserdir,sizeof(zuserdir),"%s/%s",xdg_data_dir,zappname);
+      snprintf(zuserdir,sizeof(zuserdir),"%s/%s",xdg_data_dir,zappname.c_str());
    }
    else {
-      snprintf(zuserdir,sizeof(zuserdir),"%s/.local/share/%s",getenv("HOME"),zappname);  //  /home/<username>/.local/share/appname/
+      snprintf(zuserdir,sizeof(zuserdir),"%s/.local/share/%s",getenv("HOME"),zappname.c_str());  //  /home/<username>/.local/share/appname/
    }
    cc = strlen(zuserdir);                                                        //  stop humongous username         5.3
    if (cc > 160) zappcrash("too big: %s",zuserdir);
@@ -4076,7 +4076,7 @@ int zinitapp(cchar *appname)
       if (! fid) printz("*** cannot redirect stdout and stderr \n");
    }
 
-   printz("\n =========== start %s %s \n",zappname,chTnow);
+   printz("\n =========== start %s %s \n",zappname.c_str(),chTnow);
    fflush(0);                                                                    //  5.2
 
    return 1;

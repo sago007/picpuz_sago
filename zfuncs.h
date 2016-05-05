@@ -322,7 +322,7 @@ void wprintp(GtkWidget *Win);                                                   
 typedef void clickfunc_t(GtkWidget *widget, int line, int pos);                  //  function to get clicked text position
 void textwidget_set_clickfunc(GtkWidget *widget, clickfunc_t clickfunc);         //  (wrapped lines are one logical line)
 char * textwidget_get_line(GtkWidget *widget, int line, int hilite);             //  get entire line at clicked position
-char * textwidget_get_word(char *line, int pos, cchar *dlims, char &end);        //  get delimited word at clicked position
+char * textwidget_get_word(const char *line, int pos, cchar *dlims, char &end);        //  get delimited word at clicked position
 
 //  functions to simplify building menus, tool bars, status bars
 

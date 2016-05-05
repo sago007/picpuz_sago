@@ -5278,9 +5278,10 @@ char * textwidget_get_line(GtkWidget *widget, int line, int hilite)
 //  words are defined by line starts and ends, and the given delimiter
 //  returns word and delimiter (&end)
 
-char * textwidget_get_word(char *line, int pos, cchar *dlims, char &end)
+char * textwidget_get_word(const char *line, int pos, cchar *dlims, char &end)
 {
-   char     *pp1, *pp2, *ztext;
+   const char     *pp1, *pp2;
+   char *ztext;
    int      cc;
 
    if (! line) return 0;

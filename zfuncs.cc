@@ -44,6 +44,21 @@ static char * command_output(int &contx, cchar *command, ...);                  
 static int command_status(int contx);                                                   //  get exit status of command
 
 
+static cchar * strField(cchar *string, cchar *delims, int Nth);                         //  get Nth delimited field in string
+static cchar * strField(cchar *string, cchar delim, int Nth);                           //  get Nth delimited field in string
+static int  strParms(int &bf, cchar *inp, char *pname, int maxcc, double &pval);        //  parse string: name1=val1 | name2 ...
+static int  strncpy0(char *dest, cchar *source, unsigned int cc);                               //  strncpy, insure null, return 0 if fit
+static int  strTrim(char *string);                                                      //  remove trailing blanks
+static int  strTrim2(char *dest, cchar *source);                                        //  remove leading and trailing blanks
+static int  strTrim2(char *string);                                                     //  remove leading and trailing blanks
+static int  strncatv(char *dest, int maxcc, cchar *source, ...);                        //  catenate strings (last = null)
+static int  strmatchV(cchar *string, ...);                                              //  compare to N strings, return 1-N or 0
+static int  repl_1str(cchar *strin, char *strout, cchar *ssin, cchar *ssout);           //  copy string and replace 1 substring
+static int  repl_Nstrs(cchar *strin, char *strout, ...);                                //  copy string and replace N substrings
+static int  blank_null(cchar *string);                                                  //  test for blank/null string
+static int  clean_escapes(char *string);                                                //  replace \x escapes with real characters
+static int  utf8_check(cchar *string);                                                  //  check utf8 string for encoding errors
+static int  utf8_position(cchar *utf8in, int Nth);                                      //  get byte position of Nth graphic char.
 
 /**************************************************************************
 
@@ -950,29 +965,6 @@ int strParms(int &begin, cchar *input, char *pname, int maxcc, double &pval)
 
 /**************************************************************************/
 
-//  Produce random value from hashed input string.
-//  Output range is 0 to max-1.
-//  Benchmark: 0.036 usec for 20 char. string  3.3 GHz Core i5
-
-int strHash(cchar *string, int max)
-{
-   unsigned int     hash = 1;
-   uchar    byte;
-
-   while ((byte = *string++))
-   {
-      hash *= byte;
-      hash = hash ^ (hash >> 7);
-      hash = hash & 0x00FFFFFF;
-   }
-
-   hash = hash % max;
-   return hash;
-}
-
-
-/**************************************************************************/
-
 //  Copy string with specified max. length (including null terminator).
 //  truncate if needed. null terminator is always supplied.
 //  Returns 0 if no truncation, 1 if input string was truncated to fit.
@@ -985,28 +977,6 @@ int strncpy0(char *dest, cchar *source, unsigned int cc)
    else return 0;
 }
 
-
-/**************************************************************************/
-
-//  Copy string with blank pad to specified length.  No null is added.
-
-void strnPad(char *dest, cchar *source, int cc)
-{
-   strncpy(dest,source,cc);
-   int ii = strlen(source);
-   for (int jj = ii; jj < cc; jj++) dest[jj] = ' ';
-}
-
-
-/**************************************************************************/
-
-//  Remove trailing blanks from a string. Returns remaining length.
-
-int strTrim(char *dest, cchar *source)
-{
-   if (dest != source) strcpy(dest,source);
-   return strTrim(dest);
-}
 
 int strTrim(char *dest)
 {
@@ -1039,33 +1009,6 @@ int strTrim2(char *dest, cchar *source)
 int strTrim2(char *string)
 {
    return strTrim2(string,(cchar *) string);
-}
-
-
-/**************************************************************************/
-
-//  Remove all blanks from a string. Returns remaining length.
-
-int strCompress(char *dest, cchar *source)
-{
-   if (dest != source) strcpy(dest,source);
-   return strCompress(dest);
-}
-
-int strCompress(char *string)
-{
-   int   ii, jj;
-
-   for (ii = jj = 0; string[ii]; ii++)
-   {
-      if (string[ii] != ' ')
-      {
-         string[jj] = string[ii];
-         jj++;
-      }
-   }
-   string[jj] = 0;
-   return jj;
 }
 
 
@@ -1134,47 +1077,6 @@ int strmatchV(cchar *string, ...)
    }
 }
 
-
-/**************************************************************************/
-
-//  convert string to upper case
-
-void strToUpper(char *string)
-{
-   int         ii;
-   char        jj;
-   const int   delta = 'A' - 'a';
-
-   for (ii = 0; (jj = string[ii]); ii++)
-        if ((jj >= 'a') && (jj <= 'z')) string[ii] += delta;
-}
-
-void strToUpper(char *dest, cchar *source)
-{
-   strcpy(dest,source);
-   strToUpper(dest);
-}
-
-
-/**************************************************************************/
-
-//  convert string to lower case
-
-void strToLower(char *string)
-{
-   int         ii;
-   char        jj;
-   const int   delta = 'a' - 'A';
-
-   for (ii = 0; (jj = string[ii]); ii++)
-        if ((jj >= 'A') && (jj <= 'Z')) string[ii] += delta;
-}
-
-void strToLower(char *dest, cchar *source)
-{
-   strcpy(dest,source);
-   strToLower(dest);
-}
 
 
 /**************************************************************************/
@@ -1253,148 +1155,6 @@ int repl_Nstrs(cchar *strin, char *strout, ...)
 
 /**************************************************************************/
 
-//  Break up a long text string into lines no longer than cc2 chars.             //  6.0
-//  If fake newlines ("\n") are found, replace them with real newlines.
-//  Break unconditionally where newlines are found and remove them.
-//  Break at last char = blank between cc1 and cc2 if present.
-//  Break at last delimiter char between cc1 and cc2 if present.
-//  Break unconditionally at cc2 if none of the above.
-//  Returns text lines in txout[*] with count as returned function value.
-//  txout and txout[*] are subjects for zfree().
-
-int breakup_text(cchar *txin0, char **&txout, cchar *delims, int cc1, int cc2)
-{
-   char     *txin;
-   uchar    ch;
-   int      p1, p2, cc3, Nout;
-   int      Np, Bp, Sp;
-
-   txin = zstrdup(txin0);
-   txout = (char **) zmalloc(100 * sizeof(char *));
-
-   if (strstr(txin0,"\\n"))                                                      //  replace "\n" with real newline chars
-      repl_1str(txin0,txin,"\\n","\n");
-
-   Nout = p1 = 0;
-
-   while (true)
-   {
-      p2 = p1;                                                                   //  input line position
-      cc3 = 0;                                                                   //  output line cc
-
-      Np = Bp = Sp = 0;
-
-      while (txin[p2]) {                                                         //  scan further up to cc2 chars
-         ch = txin[p2];
-         if (ch == '\n') { Np = p2; break; }                                     //  break out if newline found
-         if (cc3 >= cc1) {
-            if (ch == ' ') Bp = p2;                                              //  remember last ' ' found after cc1 chars
-            if (strchr(delims,ch))  Sp = p2;                                     //  remember last delimiter found after cc1
-         }
-         if (ch < 0)
-            while ((ch = txin[p2+1] < 0xC0)) p2++;
-         p2++;
-         cc3++;
-         if (cc3 == cc2) break;
-      }
-
-      if (! cc3 && ! Np) break;
-      if (Np) cc3 = Np - p1;
-      else if (Bp) cc3 = Bp - p1 + 1;
-      else if (Sp) cc3 = Sp - p1 + 1;
-      else cc3 = p2 - p1;
-      txout[Nout] = (char *) zmalloc(cc3+1);
-      strncpy0(txout[Nout],txin+p1,cc3+1);
-      Nout++;
-      p2 = p1 + cc3;
-      if (Np) p2++;
-      p1 = p2;
-      if (Nout == 100) break;
-   }
-
-   zfree(txin);
-   return Nout;
-}
-
-
-/**************************************************************************/
-
-//  Copy and convert string to hex string.
-//  Each input character 'A' >> 3 output characters "41 "
-
-void strncpyx(char *out, cchar *in, int ccin)
-{
-   int      ii, jj, c1, c2;
-   char     cx[] = "0123456789ABCDEF";
-
-   if (! ccin) ccin = strlen(in);
-
-   for (ii = 0, jj = 0; ii < ccin; ii++, jj += 3)
-   {
-      c1 = (uchar) in[ii] >> 4;
-      c2 = in[ii] & 15;
-      out[jj] = cx[c1];
-      out[jj+1] = cx[c2];
-      out[jj+2] = ' ';
-   }
-   out[jj] = 0;
-   return;
-}
-
-
-/**************************************************************************/
-
-//  Strip trailing zeros from ascii floating numbers
-//    (e.g. 1.230000e+02  -->  1.23e+02)
-
-void StripZeros(char *pNum)
-{
-   int     ii, cc;
-   int     pp, k1, k2;
-   char    work[20];
-
-   cc = strlen(pNum);
-   if (cc >= 20) return;
-
-   for (ii = 0; ii < cc; ii++)
-   {
-      if (pNum[ii] == '.')
-      {
-         pp = ii;
-         k1 = k2 = 0;
-         for (++ii; ii < cc; ii++)
-         {
-            if (pNum[ii] == '0')
-            {
-               if (! k1) k1 = k2 = ii;
-               else k2 = ii;
-               continue;
-            }
-
-            if ((pNum[ii] >= '1') && (pNum[ii] <= '9'))
-            {
-               k1 = 0;
-               continue;
-            }
-
-            break;
-         }
-
-         if (! k1) return;
-
-         if (k1 == pp + 1) k1++;
-         if (k2 < k1) return;
-         strcpy(work,pNum);
-         strcpy(work+k1,pNum+k2+1);
-         strcpy(pNum,work);
-         return;
-      }
-   }
-}
-
-
-/**************************************************************************/
-
 //  test for blank/null string
 //  Returns status depending on input string:
 //    0 not a blank or null string
@@ -1446,69 +1206,6 @@ int clean_escapes(char *string)
    }
 }
 
-
-/**************************************************************************/
-
-//  Compute the graphic character count for a UTF8 character string.
-//  Depends on UTF8 rules:
-//    - ascii characters are positive (0x00 to 0x7F)
-//    - 1st char of multichar sequence is negative (0xC0 to 0xFD)
-//    - subsequent multichars are in the range 0x80 to 0xBF
-
-int utf8len(cchar *utf8string)
-{
-   int      ii, cc;
-   char     xlimit = 0xC0;
-
-   for (ii = cc = 0; utf8string[ii]; ii++)
-   {
-      if (utf8string[ii] < 0)                                                    //  multibyte character
-         while (utf8string[ii+1] < xlimit) ii++;                                 //  skip extra bytes
-      cc++;
-   }
-
-   return cc;
-}
-
-
-/**************************************************************************/
-
-//  Extract a UTF8 substring with a specified count of graphic characters.
-//    utf8in     input UTF8 string
-//    utf8out    output UTF8 string, which must be long enough
-//    pos        initial graphic character position to get (0 = first)
-//    cc         max. count of graphic characters to get
-//    returns    number of graphic characters extracted, <= cc
-//  Output string is null terminated after last extracted character.
-
-int utf8substring(char *utf8out, cchar *utf8in, int pos, int cc)
-{
-   int      ii, jj, kk, posx, ccx;
-   char     xlimit = 0xC0;
-
-   for (ii = posx = 0; posx < pos && utf8in[ii]; ii++)
-   {
-      if (utf8in[ii] < 0)
-         while (utf8in[ii+1] < xlimit) ii++;
-      posx++;
-   }
-
-   jj = ii;
-
-   for (ccx = 0; ccx < cc && utf8in[jj]; jj++)
-   {
-      if (utf8in[jj] < 0)
-         while (utf8in[jj+1] < xlimit) jj++;
-      ccx++;
-   }
-
-   kk = jj - ii;
-
-   strncpy(utf8out,utf8in+ii,kk);
-   utf8out[kk] = 0;
-
-   return   ccx;
-}
 
 
 /**************************************************************************/

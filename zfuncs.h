@@ -93,35 +93,6 @@ char * fgets_trim(char * buff, int maxcc, FILE *, int bf = 0);                  
 #define strmatchcase(str1,str2) (! strcasecmp((str1),(str2)))                    //  TRUE if strings equal, ignoring case
 #define strmatchcaseN(str1,str2,cc) (! strncasecmp((str1),(str2),(cc)))          //  TRUE if strings[cc] equal, ignoring case
 
-cchar * strField(cchar *string, cchar *delims, int Nth);                         //  get Nth delimited field in string
-cchar * strField(cchar *string, cchar delim, int Nth);                           //  get Nth delimited field in string
-int  strParms(int &bf, cchar *inp, char *pname, int maxcc, double &pval);        //  parse string: name1=val1 | name2 ...
-int  strHash(cchar *string, int max);                                            //  string --> random int 0 to max-1
-int  strncpy0(char *dest, cchar *source, unsigned int cc);                               //  strncpy, insure null, return 0 if fit
-void strnPad(char *dest, cchar *source, int cc);                                 //  strncpy with blank padding to cc
-int  strTrim(char *dest, cchar *source);                                         //  remove trailing blanks
-int  strTrim(char *string);                                                      //  remove trailing blanks
-int  strTrim2(char *dest, cchar *source);                                        //  remove leading and trailing blanks
-int  strTrim2(char *string);                                                     //  remove leading and trailing blanks
-int  strCompress(char *dest, cchar *source);                                     //  remove all blanks incl. imbedded
-int  strCompress(char *string);                                                  //  remove all blanks
-int  strncatv(char *dest, int maxcc, cchar *source, ...);                        //  catenate strings (last = null)
-int  strmatchV(cchar *string, ...);                                              //  compare to N strings, return 1-N or 0
-void strToUpper(char *dest, cchar *source);                                      //  move and conv. string to upper case
-void strToUpper(char *string);                                                   //  conv. string to upper case
-void strToLower(char *dest, cchar *source);                                      //  move and conv. string to lower case
-void strToLower(char *string);                                                   //  conv. string to lower case
-int  repl_1str(cchar *strin, char *strout, cchar *ssin, cchar *ssout);           //  copy string and replace 1 substring
-int  repl_Nstrs(cchar *strin, char *strout, ...);                                //  copy string and replace N substrings
-int  breakup_text(cchar *in, char **&out, cchar *dlm, int cc1, int cc2);         //  break long string into substrings for output
-void strncpyx(char *out, cchar *in, int ccin);                                   //  conv. string to hex format
-void StripZeros(char *pNum);                                                     //  1.230000E+12 --> 1.23E+12
-int  blank_null(cchar *string);                                                  //  test for blank/null string
-int  clean_escapes(char *string);                                                //  replace \x escapes with real characters
-int  utf8len(cchar *utf8string);                                                 //  get graphic cc for UTF8 string
-int  utf8substring(char *utf8out, cchar *utf8in, int pos, int cc);               //  get graphic substring from UTF8 string
-int  utf8_check(cchar *string);                                                  //  check utf8 string for encoding errors
-int  utf8_position(cchar *utf8in, int Nth);                                      //  get byte position of Nth graphic char.
 
 //  number conversion =====================================================
 

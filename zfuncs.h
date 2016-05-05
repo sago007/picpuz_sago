@@ -94,24 +94,7 @@ char * fgets_trim(char * buff, int maxcc, FILE *, int bf = 0);                  
 #define strmatchcaseN(str1,str2,cc) (! strncasecmp((str1),(str2),(cc)))          //  TRUE if strings[cc] equal, ignoring case
 
 
-//  number conversion =====================================================
 
-int convSI (cchar *s, int &i, cchar **delm = 0);                                 //  string to int
-int convSI (cchar *s, int &i, int low, int hi, cchar **delm = 0);                //  (with low/high limit checking)
-int convSD (cchar *s, double &d, cchar **delm = 0);                              //  string to double
-int convSD (cchar *s, double &d, double low, double hi, cchar **delm = 0);       //  (with low/high limit checking)
-int convSF (cchar *s, float &f, cchar **delm = 0);                               //  string to double
-int convSF (cchar *s, float &f, float low, float hi, cchar **delm = 0);          //  (with low/high limit checking)
-int convIS (int iin, char *outp, int *cc = 0);                                   //  int to string, returned cc
-int convDS (double din, int prec, char *outp, int *cc = 0);                      //  double to string, precision, ret. cc
-char * formatKBMB(double fnum, int prec);                                        //  format nnn B, nn.n KB, n.nn MB, etc.
-
-//  wildcard functions ====================================================
-
-int MatchWild(cchar * wildstr, cchar * str);                                     //  wildcard string match (match = 0)
-int MatchWildIgnoreCase(cchar * wildstr, cchar * str);                           //  wildcard string match, ignoring case
-cchar * SearchWild(cchar *wpath, int &flag);                                     //  wildcard file search
-cchar * SearchWildIgnoreCase(cchar *wpath, int &flag);                           //  wildcard file search, ignoring case
 
 //  search and sort functions =============================================
 

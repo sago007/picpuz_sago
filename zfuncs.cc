@@ -47,8 +47,6 @@
    compact_time            convert time_t type to yyyymmddhhmmss format
    pretty_datetime         convert time_t type to yyyy-mm-dd hh:mm:ss format
    proc file functions     parse data from various /proc files
-   coretemp                get current processor core temperature
-   disktemp                get temperature for given disk drive
    zsleep                  sleep for any amount of time (e.g. 0.1 seconds)
    global_lock             lock/unlock a global resource (all processes/threads)
    resource_lock           lock/unlock a resource within a process + threads
@@ -570,58 +568,6 @@ double get_timer(double &time0)
 }
 
 
-/**************************************************************************/
-
-//  start a process CPU timer or get elapsed process CPU time
-//  returns seconds with millisecond resolution
-
-void start_CPUtimer(double &time0)
-{
-   time0 = CPUtime();
-   return;
-}
-
-double get_CPUtimer(double &time0)
-{
-   return CPUtime() - time0;
-}
-
-
-/**************************************************************************/
-
-//  get elapsed CPU time used by current process
-//  returns seconds with millisecond resolution
-
-double CPUtime()
-{
-   clock_t ctime = clock();
-   double dtime = ctime / 1000000.0;
-   return dtime;
-}
-
-
-
-/**************************************************************************/
-
-//  get elapsed process time for my process, including threads and child processes.
-
-double jobtime()
-{
-   double   jiffy = 1.0 / sysconf(_SC_CLK_TCK);                                  //  "jiffy" time slice = 1.0 / HZ
-   char     buff[200];
-   double   cpu1, cpu2, cpu3, cpu4;
-   FILE     *fid;
-   char     *pp;
-
-   fid = fopen("/proc/self/stat","r");
-   if (! fid) return 0;
-   pp = fgets(buff,200,fid);
-   fclose(fid);
-   if (! pp) return 0;
-
-   parseprocrec(pp,14,&cpu1,15,&cpu2,16,&cpu3,17,&cpu4,null);
-   return (cpu1 + cpu2 + cpu3 + cpu4) * jiffy;
-}
 
 
 /**************************************************************************/
@@ -629,7 +575,7 @@ double jobtime()
 //  convert a time_t date/time (e.g. st_mtime from stat() call)
 //    into a compact date/time format "yyyymmddhhmmss"
 
-void compact_time(const time_t DT, char *compactDT)                              //  5.5
+void compact_time(const time_t &DT, char *compactDT)                              //  5.5
 {
    struct tm   *fdt;
    int         year, mon, day, hour, min, sec;
@@ -668,7 +614,7 @@ void compact_time(const time_t DT, char *compactDT)                             
 //  convert a time_t date/time (e.g. st_mtime from stat() call)
 //    into a pretty date/time format "yyyy-mm-dd hh:mm:ss"
 
-void pretty_datetime(const time_t DT, char *prettyDT)                            //  6.2
+void pretty_datetime(const time_t &DT, char *prettyDT)                            //  6.2
 {
    struct tm   *fdt;
    int         year, mon, day, hour, min, sec;
@@ -803,69 +749,6 @@ int parseprocrec(char *prec, int field, double *value, ...)                     
 
    va_end(arglist);
    return found;
-}
-
-
-/**************************************************************************/
-
-//  get current processor core temperature
-//  depends on "sensors" command from package lm-sensors
-
-int coretemp()
-{
-   FILE     *fid;
-   char     buff[100], *pp;
-   int      temp = 0;
-
-   fid = popen("sensors","r");
-   if (! fid) return temp;
-   
-   while (true) {
-      pp = fgets(buff,100,fid);
-      if (! pp) break;
-      if (! strmatchN(pp,"Physical id 0:",14)) continue;
-      pp = strchr(pp+14,'+');
-      if (! pp) break;
-      temp = atoi(pp);
-      break;
-   }
-   
-   pclose(fid);
-   return temp;
-}
-
-
-/**************************************************************************/
-
-//  get current temperature for given disk, e.g. "/dev/sda"
-
-int disktemp(char *disk)                                                         //  5.9
-{
-   int         id, temp;
-   char        *pp, *pp2;
-   char        buff[200], command[100];
-   FILE        *ffid;
-
-   temp = 0;
-   pp2 = 0;
-   snprintf(command,100,"smartctl -A %s",disk);
-   ffid = popen(command,"r");
-   if (! ffid) return 0;
-
-   while (true) {
-      pp = fgets(buff,200,ffid);                                                 //  revised for smartctl report
-      if (! pp) break;                                                           //    format changes
-      if (strmatchN(pp,"ID#",3)) pp2 = strstr(pp,"RAW_VALUE");
-      id = atoi(pp);
-      if (id != 190 && id != 194) continue;                                      //  Airflow Temp. or Temp.
-      if (! pp2) continue;
-      temp = atoi(pp2);
-      if (temp < 10 || temp > 99) temp = 0;
-      break;
-   }
-
-   pclose(ffid);
-   return temp;
 }
 
 
@@ -10677,7 +10560,7 @@ PIXBUF * gdk_pixbuf_rotate(PIXBUF *pixbuf1, float angle, int acolor)
 //  strip the alpha channel from a pixbuf
 //  returns 0 if no alpha channel or fatal error
 
-PIXBUF * gdk_pixbuf_stripalpha(PIXBUF *pixbuf1)                                  //  6.2
+PIXBUF * gdk_pixbuf_stripalpha(const PIXBUF *pixbuf1)                                  //  6.2
 {
    PIXBUF      *pixbuf2;
    GDKCOLOR    color;

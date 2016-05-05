@@ -40,6 +40,7 @@
 #include <locale.h>
 #include <gtk/gtk.h>
 #include <string>
+#include <vector>
 
 #define VERTICAL GTK_ORIENTATION_VERTICAL                                        //  GTK shortcuts
 #define HORIZONTAL GTK_ORIENTATION_HORIZONTAL
@@ -94,19 +95,10 @@ void tracedump();                                                               
 void beroot(int argc = 0, char *argv[] = 0);                                     //  restart image as root if password OK
 
 double get_seconds();                                                            //  seconds since 2000.01.01
-void start_timer(double &time0);                                                 //  start a timer
-double get_timer(double &time0);                                                 //  get elapsed time in seconds
-void start_CPUtimer(double &time0);                                              //  start a process CPU timer
-double get_CPUtimer(double &time0);                                              //  get elapsed CPU time, seconds
-double CPUtime();                                                                //  get elapsed process CPU time for main()
-double CPUtime2();                                                               //   " include all threads
-double jobtime();                                                                //   " include all threads + subprocesses
-void compact_time(const time_t DT, char *compactDT);                             //  time_t DT to yyyymmddhhmmss
-void pretty_datetime(const time_t DT, char *prettyDT);                           //  time_t DT to yyyy-mm-dd hh:mm:ss
+void compact_time(const time_t &DT, char *compactDT);                             //  time_t DT to yyyymmddhhmmss
+void pretty_datetime(const time_t &DT, char *prettyDT);                           //  time_t DT to yyyy-mm-dd hh:mm:ss
 int  parseprocfile(cchar *pfile, cchar *pname, double *value, ...);              //  get data from /proc file
-int  parseprocrec(char *prec, int field, double *value, ...);                    //  get data from /proc file record
-int  coretemp();                                                                 //  get CPU core temperature, deg. C   v.6.1
-int  disktemp(char *disk);                                                       //  get disk temp, e.g. "/dev/sda"     v.5.9
+int  parseprocrec(char *prec, int field, double *value, ...);                    //  get data from /proc file record                                                 //  get disk temp, e.g. "/dev/sda"     v.5.9
 void zsleep(double dsecs);                                                       //  sleep specified seconds
 int  global_lock(cchar *lockfile);                                               //  obtain exclusive lock, multi-process
 int  global_unlock(int fd, cchar *lockfile);                                     //  release the lock
@@ -534,5 +526,5 @@ void drag_drop_connect(GtkWidget *window, drag_drop_func);                      
 PIXBUF * get_thumbnail(cchar *fpath, int size);                                  //  get sized thumbnail for image file
 GdkCursor * zmakecursor(cchar *iconfile);                                        //  make a cursor from an image file
 PIXBUF * gdk_pixbuf_rotate(PIXBUF *, float deg, int alfa = 0);                   //  rotate pixbuf through any angle
-PIXBUF * gdk_pixbuf_stripalpha(PIXBUF *pixbuf);                                  //  strip alpha channel from pixbuf
+PIXBUF * gdk_pixbuf_stripalpha(const PIXBUF *pixbuf);                                  //  strip alpha channel from pixbuf
 PIXBUF * text_pixbuf(cchar *text, cchar *font, int fsize, GtkWidget *);          //  create pixbuf with text using font

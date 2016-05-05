@@ -77,22 +77,8 @@
 
 //  system functions ======================================================
 
-void *zmalloc(unsigned int cc);                                                          //  malloc() with counter              v.5.8
-void zfree(void *pp);                                                            //  free() with counter
-char *zstrdup(cchar *string, int addcc = 0);                                     //  strdup() with counter
 
-void printz(cchar *format, ...);                                                 //  printf() with immediate fflush()   v.5.8
-void zpopup_message(int secs, cchar *format, ...);                               //  popup message, thread safe
-
-void zbacktrace();                                                               //  produce a backtrace to stdout      v.5.9
-void zappcrash(cchar *format, ...);                                              //  crash with popup message in text window
-void trace(cchar *file, cchar *func, int line, void *addr);                      //  implements TRACE macro
-void tracedump();                                                                //  dump program trace data
-
-double get_seconds();                                                            //  seconds since 2000.01.01
-void compact_time(const time_t &DT, char *compactDT);                             //  time_t DT to yyyymmddhhmmss
-void pretty_datetime(const time_t &DT, char *prettyDT);                           //  time_t DT to yyyy-mm-dd hh:mm:ss
-int  parseprocrec(char *prec, int field, double *value, ...);                    //  get data from /proc file record                                                 //  get disk temp, e.g. "/dev/sda"     v.5.9
+                                             //  get disk temp, e.g. "/dev/sda"     v.5.9
 void zsleep(double dsecs);                                                       //  sleep specified seconds
 int  global_lock(cchar *lockfile);                                               //  obtain exclusive lock, multi-process
 int  global_unlock(int fd, cchar *lockfile);                                     //  release the lock

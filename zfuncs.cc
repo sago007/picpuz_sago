@@ -28,6 +28,17 @@
 
 #include "zfuncs.h"
 
+static void *zmalloc(unsigned int cc);                                                          //  malloc() with counter              v.5.8
+static void zfree(void *pp);                                                            //  free() with counter
+static char *zstrdup(cchar *string, int addcc = 0);                                     //  strdup() with counter
+
+
+static void printz(cchar *format, ...);                                                 //  printf() with immediate fflush()   v.5.8
+static void zpopup_message(int secs, cchar *format, ...);                               //  popup message, thread safe
+
+static void zappcrash(cchar *format, ...);                                              //  crash with popup message in text window
+
+
 /**************************************************************************
 
    Table of Contents
@@ -473,22 +484,6 @@ void tracedump()
 
 /**************************************************************************/
 
-//  get time in real seconds (since 2000.01.01 00:00:00)
-//  (microsecond resolution until at least 2030)
-
-double get_seconds()
-{
-   timeval  time1;
-   double   time2;
-
-   gettimeofday(&time1,0);
-   time2 = time1.tv_sec + 0.000001 * time1.tv_usec - 946684800.0;                //  5.2
-   return time2;
-}
-
-
-/**************************************************************************/
-
 //  start a timer or get elapsed time with millisecond resolution.
 
 void start_timer(double &time0)
@@ -511,132 +506,6 @@ double get_timer(double &time0)
 }
 
 
-
-
-/**************************************************************************/
-
-//  convert a time_t date/time (e.g. st_mtime from stat() call)
-//    into a compact date/time format "yyyymmddhhmmss"
-
-void compact_time(const time_t &DT, char *compactDT)                              //  5.5
-{
-   struct tm   *fdt;
-   int         year, mon, day, hour, min, sec;
-
-   fdt = localtime(&DT);
-
-   year = fdt->tm_year + 1900;
-   mon = fdt->tm_mon + 1;
-   day = fdt->tm_mday;
-   hour = fdt->tm_hour;
-   min = fdt->tm_min;
-   sec = fdt->tm_sec;
-
-   compactDT[0] = year / 1000 + '0';
-   compactDT[1] = (year % 1000) / 100 + '0';
-   compactDT[2] = (year % 100) / 10 + '0';
-   compactDT[3] = year % 10 + '0';
-   compactDT[4] = mon / 10 + '0';
-   compactDT[5] = mon % 10 + '0';
-   compactDT[6] = day / 10 + '0';
-   compactDT[7] = day % 10 + '0';
-   compactDT[8] = hour / 10 + '0';
-   compactDT[9] = hour % 10 + '0';
-   compactDT[10] = min / 10 + '0';
-   compactDT[11] = min % 10 + '0';
-   compactDT[12] = sec / 10 + '0';
-   compactDT[13] = sec % 10 + '0';
-   compactDT[14] = 0;
-
-   return;
-}
-
-
-/**************************************************************************/
-
-//  convert a time_t date/time (e.g. st_mtime from stat() call)
-//    into a pretty date/time format "yyyy-mm-dd hh:mm:ss"
-
-void pretty_datetime(const time_t &DT, char *prettyDT)                            //  6.2
-{
-   struct tm   *fdt;
-   int         year, mon, day, hour, min, sec;
-
-   fdt = localtime(&DT);
-
-   year = fdt->tm_year + 1900;
-   mon = fdt->tm_mon + 1;
-   day = fdt->tm_mday;
-   hour = fdt->tm_hour;
-   min = fdt->tm_min;
-   sec = fdt->tm_sec;
-
-   prettyDT[0] = year / 1000 + '0';
-   prettyDT[1] = (year % 1000) / 100 + '0';
-   prettyDT[2] = (year % 100) / 10 + '0';
-   prettyDT[3] = year % 10 + '0';
-   prettyDT[4] = '-';
-   prettyDT[5] = mon / 10 + '0';
-   prettyDT[6] = mon % 10 + '0';
-   prettyDT[7] = '-';
-   prettyDT[8] = day / 10 + '0';
-   prettyDT[9] = day % 10 + '0';
-   prettyDT[10] = ' ';
-   prettyDT[11] = hour / 10 + '0';
-   prettyDT[12] = hour % 10 + '0';
-   prettyDT[13] = ':';
-   prettyDT[14] = min / 10 + '0';
-   prettyDT[15] = min % 10 + '0';
-   prettyDT[16] = ':';
-   prettyDT[17] = sec / 10 + '0';
-   prettyDT[18] = sec % 10 + '0';
-   prettyDT[19] = 0;
-
-   return;
-}
-
-
-
-//  Parse /proc record of the type  "xxx xxxxx xxxxx xxxxxxxx xxx"
-//  Return numeric values for requested fields (starting with 1)
-
-int parseprocrec(char *prec, int field, double *value, ...)                      //  EOL = 0
-{
-   va_list     arglist;
-   int         xfield = 1, found = 0;
-
-   va_start(arglist,value);
-
-   while (*prec == ' ') prec++;                                                  //  skip leading blanks
-
-   while (field > 0)
-   {
-      while (xfield < field)                                                     //  skip to next wanted field
-      {
-         prec = strchr(prec,' ');                                                //  find next blank
-         if (! prec) break;
-         while (*prec == ' ') prec++;                                            //  skip multiple blanks
-         xfield++;
-      }
-
-      if (! prec) break;
-      *value = atof(prec);                                                       //  convert, return double
-      found++;
-
-      field = va_arg(arglist,int);                                               //  next field number
-      value = va_arg(arglist,double *);                                          //  next output double *
-   }
-
-   while (field > 0)
-   {
-      *value = 0;                                                                //  zero values not found
-      field = va_arg(arglist,int);
-      value = va_arg(arglist,double *);
-   }
-
-   va_end(arglist);
-   return found;
-}
 
 
 /**************************************************************************/

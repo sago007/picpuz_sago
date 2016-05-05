@@ -70,9 +70,6 @@
 #define  mutex_destroy  pthread_mutex_destroy
 
 #define  XFCC 1000                                                               //  max. file pathname cc tolerated
-#define  null   NULL
-#define  true   1
-#define  false  0
 
 //  trace execution: source file, function, line no, caller address
 

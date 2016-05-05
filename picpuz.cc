@@ -28,7 +28,7 @@
 using std::string;
 using std::vector;
 
-#define gtitle "Picpuz v.2.7"                                                    //  version
+const char* const gtitle = "Picpuz v.2.7";                                                    //  version
 #define Tindex(row,col) row * Ncols + col                                        //  map row/col to linear index
 #define drand(seed,range) (drandz(&seed) * range)                                //  random double, 0.0 to 0.9999 * range
 #define lrand(seed,range) (lrandz(&seed) % range)                                //  random integer, 0 to range-1
@@ -277,7 +277,7 @@ void m_tile()
    if (! Ntiles) return;
    if (puzzle_status()) return;                                                  //  do not discard
 
-   zd = zdialog_new(ZTX("change tile size"),win1,"OK",ZTX("cancel"),null);
+   zd = zdialog_new(ZTX("change tile size"),win1,"OK",ZTX("cancel"),nullptr);
    zdialog_add_widget(zd,"hbox","hb1","dialog",0,"space=10");
    zdialog_add_widget(zd,"label","lb1","hb1",ZTX("new tile size (pixels)"));
    zdialog_add_widget(zd,"spin","spin","hb1","20|200|1|80");

@@ -211,17 +211,17 @@ void winpaint(GtkWidget *, cairo_t *cr)
 
 void menufunc(GtkWidget *, const char *menu)
 {
-   if (strmatch(menu,ZTX("open"))) m_open(0);
-   if (strmatch(menu,ZTX("tile"))) m_tile();
-   if (strmatch(menu,ZTX("mix"))) m_mix();
-   if (strmatch(menu,ZTX("show"))) m_show();
-   if (strmatch(menu,ZTX("toolbar::save"))) m_save();
-   if (strmatch(menu,ZTX("resume"))) m_resume();
-   if (strmatch(menu,ZTX("do 1"))) m_doN(1);
-   if (strmatch(menu,ZTX("do 8"))) m_doN(8);
-   if (strmatch(menu,ZTX("line"))) m_line();
-   if (strmatch(menu,ZTX("quit"))) m_quit();
-   if (strmatch(menu,ZTX("help"))) m_help();
+   if (strmatch(menu,"open")) m_open(0);
+   if (strmatch(menu,"tile")) m_tile();
+   if (strmatch(menu,"mix")) m_mix();
+   if (strmatch(menu,"show")) m_show();
+   if (strmatch(menu,"toolbar::save")) m_save();
+   if (strmatch(menu,"resume")) m_resume();
+   if (strmatch(menu,"do 1")) m_doN(1);
+   if (strmatch(menu,"do 8")) m_doN(8);
+   if (strmatch(menu,"line")) m_line();
+   if (strmatch(menu,"quit")) m_quit();
+   if (strmatch(menu,"help")) m_help();
 }
 
 

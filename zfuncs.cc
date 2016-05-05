@@ -73,6 +73,9 @@ typedef int HeapSortUcomp(cchar *rec1, cchar *rec2);                            
 static void HeapSort(char *vv1[], char *vv2[], int nn);                                 //  Heap Sort - parallel char *, ascending order
 
 
+static int lrandz();                                                                    //  built-in seed
+
+
 /**************************************************************************
 
    Table of Contents
@@ -1768,12 +1771,6 @@ double drandz(int64 *seed)                                                      
    *seed = *seed ^ (*seed << 17);
    *seed = *seed ^ (*seed << 20);
    return erand48((unsigned int16 *) seed);
-}
-
-double drandz()                                                                  //  implicit seed, repeatable sequence
-{
-   static int64   seed = 23459876;
-   return drandz(&seed);
 }
 
 

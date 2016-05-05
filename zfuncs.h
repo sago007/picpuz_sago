@@ -107,9 +107,7 @@ struct  pvlist {
 //  random number functions ===============================================
 
 int lrandz(int64 * seed);                                                        //  returns 0 to 0x7fffffff
-int lrandz();                                                                    //  built-in seed
 double drandz(int64 * seed);                                                     //  returns 0.0 to 0.99999...
-double drandz();                                                                 //  built-in seed
 
 //  spline curve-fitting functions ========================================
 

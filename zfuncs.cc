@@ -249,19 +249,17 @@ namespace zfuncs
 
 void *zmalloc(unsigned int cc)
 {
-   static unsigned int allocated = 0, fwarn = 0;
-   double      free, cache;
+   static unsigned int allocated = 0;
+   static bool fwarn = false;
 
    ///printz("zmalloc %p %d \n",__builtin_return_address(0),cc);
    allocated += cc;                                                              //  check memory each 1 MB allocated
-   if (allocated > 1000000) {
+   if (allocated > 1000*1000*1000) {
       allocated = 0;
-      parseprocfile("/proc/meminfo","MemFree:",&free,"Cached:",&cache,0);
-      free = (free + cache) / 1024.0;
-      if (free < 500 && ! fwarn) {                                               //  warn if < 500 MB                6.0
-         fwarn = 1;
-         printz("LOW MEMORY - performance may be poor \n");
-         zpopup_message(10," LOW MEMORY - performance may be poor");
+      if (! fwarn) {                                               
+         fwarn = true;
+         printz("HI MEMORY USAGE - performance may be poor \n");
+         zpopup_message(10,"HI MEMORY USAGE - performance may be poor");
       }
    }
 
@@ -652,62 +650,6 @@ void pretty_datetime(const time_t &DT, char *prettyDT)                          
    return;
 }
 
-
-/**************************************************************************/
-
-//  Read and parse /proc file with records formatted "parmname xxxxxxx"
-//  Find all requested parameters and return their numeric values
-
-int parseprocfile(cchar *pfile, cchar *pname, double *value, ...)                //  EOL = 0
-{
-   FILE        *fid;
-   va_list     arglist;
-   char        buff[1000];
-   const char  *pnames[20];
-   double      *values[20];
-   int         ii, fcc, wanted, found;
-
-   pnames[0] = pname;                                                            //  1st parameter
-   values[0] = value;
-   *value = 0;
-
-   va_start(arglist,value);
-
-   for (ii = 1; ii < 20; ii++)                                                   //  get all parameters
-   {
-      pnames[ii] = va_arg(arglist,char *);
-      if (! pnames[ii]) break;
-      values[ii] = va_arg(arglist,double *);
-      *values[ii] = 0;                                                           //  initialize to zero
-   }
-
-   va_end(arglist);
-
-   if (ii == 20) zappcrash("parseProcFile, too many fields");
-   wanted = ii;
-   found = 0;
-
-   fid = fopen(pfile,"r");                                                       //  open /proc/xxx file
-   if (! fid) return 0;
-
-   while ((fgets(buff,999,fid)))                                                 //  read record, "parmname nnnnn"
-   {
-      for (ii = 0; ii < wanted; ii++)
-      {                                                                          //  look for my fields
-         fcc = strlen(pnames[ii]);
-         if (strmatchN(buff,pnames[ii],fcc)) {
-            *values[ii] = atof(buff+fcc);                                        //  return value
-            found++;
-            break;
-         }
-      }
-
-      if (found == wanted) break;                                                //  stop when all found
-   }
-
-   fclose(fid);
-   return found;
-}
 
 
 //  Parse /proc record of the type  "xxx xxxxx xxxxx xxxxxxxx xxx"

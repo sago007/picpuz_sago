@@ -97,7 +97,6 @@ void beroot(int argc = 0, char *argv[] = 0);                                    
 double get_seconds();                                                            //  seconds since 2000.01.01
 void compact_time(const time_t &DT, char *compactDT);                             //  time_t DT to yyyymmddhhmmss
 void pretty_datetime(const time_t &DT, char *prettyDT);                           //  time_t DT to yyyy-mm-dd hh:mm:ss
-int  parseprocfile(cchar *pfile, cchar *pname, double *value, ...);              //  get data from /proc file
 int  parseprocrec(char *prec, int field, double *value, ...);                    //  get data from /proc file record                                                 //  get disk temp, e.g. "/dev/sda"     v.5.9
 void zsleep(double dsecs);                                                       //  sleep specified seconds
 int  global_lock(cchar *lockfile);                                               //  obtain exclusive lock, multi-process

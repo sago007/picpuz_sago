@@ -203,14 +203,6 @@
    gdk_pixbuf_stripalpha   remove an alpha channel from a pixbuf
    text_pixbuf             create pixbuf containing text 
 
-   C++ Classes
-   -----------
-   xstring              string manipulation (= / + / insert / overlay)
-   Vxstring             array of xstrings with auto growth
-   HashTab              hash table: add, delete, find, step through
-   Queue                queue of xstrings: push, pop first or last
-   Tree                 store / retrieve data by node names or numbers, any depth
-
 
 ***************************************************************************/
 
@@ -224,7 +216,8 @@ namespace zfuncs
    GtkSettings       *settings;                                                  //  screen settings                    6.2
    std::string        zappname;                                                     //  app name/version
    std::string		zprefix;
-   char        zdatadir[200], zdocdir[200];                        //  app directories
+   std::string		zdatadir;
+   char        zdocdir[200];                        //  app directories
    char        zicondir[200], zlocalesdir[200], zuserdir[200];
    char        zlang[8] = "en";                                                  //  "lc" or "lc_RC"
    char        JPGquality[4] = "90";                                             //  JPG file save quality
@@ -3672,7 +3665,7 @@ float  spline2(float x)
 
 const std::string& get_zprefix() { return zfuncs::zprefix; }                                //  /usr or /home/<userid>
 cchar * get_zuserdir() { return zfuncs::zuserdir; }                              //  /home/user/.local/share/appname
-cchar * get_zdatadir() { return zfuncs::zdatadir; }                              //  parameters, icons
+const std::string& get_zdatadir() { return zfuncs::zdatadir; }                              //  parameters, icons
 cchar * get_zdocdir()  { return zfuncs::zdocdir;  }                              //  documentation files
 cchar * get_zicondir()  { return zfuncs::zicondir;  }                            //  icon files
 cchar * get_zlocalesdir()  { return zfuncs::zlocalesdir;  }                      //  translation files
@@ -3698,7 +3691,7 @@ int zinitapp(cchar *appname)
 
    work = PREFIX;                                                    //  /usr or /home/<userid>
    zprefix = work;                                                         //  /prefix
-   strncatv(zdatadir,199,work.c_str(),"/share/",zappname.c_str(),"/data",null);                  //  /prefix/share/appname/data
+   zdatadir = work + "/share/" + zappname + "/data";                  //  /prefix/share/appname/data
    strncatv(zicondir,199,work.c_str(),"/share/",zappname.c_str(),"/icons",null);                 //  /prefix/share/appname/icons
    strncatv(zlocalesdir,199,work.c_str(),"/share/",zappname.c_str(),"/locales",null);            //  /prefix/share/appname/locales
    strncatv(zdocdir,199,work.c_str(),"/share/doc/",zappname.c_str(),null);                       //  /prefix/share/doc/appname
@@ -3726,7 +3719,7 @@ int zinitapp(cchar *appname)
    if (err) {
       err = mkdir(zuserdir,0750);                                                //  no, create and initialize
       if (err) zappcrash("cannot create %s",zuserdir);
-      shell_quiet("cp -R %s/* %s",zdatadir,zuserdir);                            //  copy initial data files         6.0
+      shell_quiet("cp -R %s/* %s",zdatadir.c_str(),zuserdir);                            //  copy initial data files         6.0
    }
 
    tid_main = pthread_self();                                                    //  thread ID of main() process
@@ -3758,25 +3751,25 @@ int zinitapp(cchar *appname)
 //    file type: doc, data, locale, user  [ userlocale removed v.6.1 ]
 //    file name: README, changelog, userguide.html, parameters, translate.po ...
 //  Returns complete file name, e.g. /usr/share/appname/locales/translate-de.po
-//  Output filespec should be 200 bytes (limit for all installation files).
+//  Output filespec should be a std::string.
 //  Returns 0 if OK, +N if not found.
 
-int locale_filespec(cchar *filetype, cchar *filename, char *filespec)
+int locale_filespec(cchar *filetype, cchar *filename, std::string& filespec)
 {
    using namespace zfuncs;
 
    char     *pp, fname[20], fext[8];
    char     lc_RC[8];                                                            // -lc or -lc_RC
-   int      cc, err;
+   int      err;
    STATB    statb;
 
-   filespec[0] = '/';
-   strcat(filespec,filetype);                                                    //  leave /type as default
+   filespec = "/";
+   filespec += filetype;                                                    //  leave /type as default
 
-   if (strmatch(filetype,"doc")) strcpy(filespec,zdocdir);                       //  /usr/share/doc/appname
-   if (strmatch(filetype,"data")) strcpy(filespec,zdatadir);                     //  /usr/share/appname/data
-   if (strmatch(filetype,"locale")) strcpy(filespec,zlocalesdir);                //  /usr/share/appname/locales
-   if (strmatch(filetype,"user")) strcpy(filespec,zuserdir);                     //  /home/<user>/.appname
+   if (strmatch(filetype,"doc")) filespec = zdocdir;                       //  /usr/share/doc/appname
+   if (strmatch(filetype,"data")) filespec = zdatadir;                     //  /usr/share/appname/data
+   if (strmatch(filetype,"locale")) filespec = zlocalesdir;                //  /usr/share/appname/locales
+   if (strmatch(filetype,"user")) filespec = zuserdir;                     //  /home/<user>/.appname
 
    strncpy0(fname,filename,20);
    pp = strchr(fname,'.');
@@ -3791,33 +3784,33 @@ int locale_filespec(cchar *filetype, cchar *filename, char *filespec)
 
 tryextras:
 
-   cc = strlen(filespec);
-   filespec[cc] = '/';                                                           //  /directories.../
-   strcpy(filespec+cc+1,fname);                                                  //  /directories.../fname
-   cc = strlen(filespec);                                                        //                       |
-   pp = filespec + cc;                                                           //                       pp
+   filespec += "/";                                                           //  /directories.../
+   filespec += fname;                                                  //  /directories.../fname
+   std::string basic_path = filespec;
+   //pp = filespec + cc;                                                           //                       pp
 
-   strcpy(pp,lc_RC);                                                             //  /directories.../fname-lc_RC.fext
-   strcat(pp,fext);
-   err = stat(filespec,&statb);
+   filespec += lc_RC;                                                             //  /directories.../fname-lc_RC.fext
+   filespec += fext;
+   err = stat(filespec.c_str(),&statb);
    if (! err) return 0;
 
-   strcpy(pp+3,fext);                                                            //  /directories.../fname-lc.fext
-   err = stat(filespec,&statb);
+   //  /directories.../fname-lc.fext
+   filespec = filespec.substr(0,basic_path.length()+3)+fext;
+   err = stat(filespec.c_str(),&statb);
    if (! err) return 0;
 
-   strcpy(pp,"-en");                                                             //  /directories.../fname-en.fext
-   strcat(pp,fext);
-   err = stat(filespec,&statb);
+   //  /directories.../fname-en.fext
+   filespec = basic_path + "-en" + fext;
+   err = stat(filespec.c_str(),&statb);
    if (! err) return 0;
 
-   strcpy(pp,fext);                                                              //  /directories.../fname.fext
-   err = stat(filespec,&statb);
+   filespec = basic_path + fext;                                                              //  /directories.../fname.fext
+   err = stat(filespec.c_str(),&statb);
    if (! err) return 0;
 
    if (strmatch(filetype,"doc")) {                                               //  these files may be placed in
-      strcpy(filespec,zdocdir);                                                  //    /usr/share/doc/appname/extras
-      strcat(filespec,"/extras");                                                //       due to Linux chaos
+      filespec = zdocdir;                                                  //    /usr/share/doc/appname/extras
+      filespec += "/extras";                                                //       due to Linux chaos
       filetype = "";
       goto tryextras;                                                            //  try again using /extras
    }
@@ -3835,7 +3828,8 @@ tryextras:
 
 void showz_userguide(cchar *context)                                             //  5.5
 {
-   char     filespec[200], url[200];
+	std::string filespec;
+   char     url[200];
    int      err;
 
    err = locale_filespec("data","userguide.html",filespec);
@@ -3845,7 +3839,7 @@ void showz_userguide(cchar *context)                                            
       return;
    }
 
-   snprintf(url,199,"file://%s",filespec);
+   snprintf(url,199,"file://%s",filespec.c_str());
 
    if (context && *context)                                                      //  specific topic wanted
       strncatv(url,199,"#",context,null);                                        //  file://.../userguide-xx.html#context
@@ -3880,15 +3874,16 @@ void showz_logfile()                                                            
 
 void showz_textfile(const char *type, const char *file)                          //  5.5
 {
-   char     filex[40], filespec[200], command[200];
+   char     filex[40], command[200];
    int      err;
 
    strncpy0(filex,file,36);                                                      //  look for gzip file first      5.7
    strcat(filex,".gz");
 
+   std::string filespec;
    err = locale_filespec(type,filex,filespec);
    if (! err) {
-      snprintf(command,200,"zcat %s",filespec);
+      snprintf(command,200,"zcat %s",filespec.c_str());
       popup_command(command,600,400,0,1);
       return;
    }
@@ -3897,7 +3892,7 @@ void showz_textfile(const char *type, const char *file)                         
 
    err = locale_filespec(type,filex,filespec);
    if (! err) {
-      snprintf(command,200,"cat %s",filespec);
+      snprintf(command,200,"cat %s",filespec.c_str());
       popup_command(command,600,400,0,1);
       return;
    }
@@ -4091,8 +4086,8 @@ void ZTXinit(cchar *lang)                                                       
    using namespace ZTXnames;
 
    int      ii, err;
-   char     installpo[200], localpo[200];
-   char     *pp, poname[20];
+   char     localpo[200];
+   char     *pp;
 
    if (Ntext) {                                                                  //  free prior translation
       for (ii = 0; ii < Ntext; ii++) {
@@ -4127,6 +4122,7 @@ void ZTXinit(cchar *lang)                                                       
 
    if (strmatchN(zlang,"en",2)) return;                                          //  English, do nothing
 
+   std::string installpo;
    err = locale_filespec("locale","translate.po",installpo);                     //  look for installed .po file
    if (err) err = locale_filespec("locale","translate.po.gz",installpo);
    if (err) {
@@ -4134,17 +4130,18 @@ void ZTXinit(cchar *lang)                                                       
       return;
    }
 
-   pp = strrchr(installpo,'/');                                                  //  extract filename from full path
-   strcpy(poname,pp+1);
-   pp = strstr(poname,".gz");                                                    //  uncompress or copy installed .po file
-   if (pp) {
-      *pp = 0;
-      err = shell_ack("gunzip -c %s > %s/%s",installpo,zuserdir,poname);
+    //  extract filename from full path
+   size_t last_of_start = installpo.find_last_of('/');
+   std::string poname = installpo.substr(last_of_start+1);
+   std::size_t found = poname.find(".gz");
+   if (found!=std::string::npos) {
+	   poname = "";
+      err = shell_ack("gunzip -c %s > %s/%s",installpo.c_str(),zuserdir,poname.c_str());
    }
-   else err = shell_ack("cp %s %s/%s",installpo,zuserdir,poname);
+   else err = shell_ack("cp %s %s/%s",installpo.c_str(),zuserdir,poname.c_str());
    if (err) return;
 
-   snprintf(localpo,200,"%s/%s",zuserdir,poname);                                //  final local .po file name
+   snprintf(localpo,200,"%s/%s",zuserdir,poname.c_str());                                //  final local .po file name
 
    fidr = fopen(localpo,"r");                                                    //  open .po file
    if (! fidr) {

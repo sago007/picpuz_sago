@@ -230,10 +230,10 @@ float spline2(float x);                                                         
 int zinitapp(cchar *appname);                                                    //  initz. app directories and files   v.4.1
 const std::string& get_zprefix();                                                           //  get /usr or /usr/local  ...        v.4.1
 cchar * get_zuserdir();                                                          //  get /home/user/.appname/
-cchar * get_zdatadir();                                                          //  get data directory
+const std::string& get_zdatadir();                                                          //  get data directory
 cchar * get_zdocdir();                                                           //  get document directory
 cchar * get_zicondir();                                                          //  get icon directory                 v.5.7
-int  locale_filespec(cchar *ftype, cchar *fname, char *filespec);                //  get a locale dependent file        v.5.5
+int  locale_filespec(cchar *ftype, cchar *fname, std::string& filespec);                //  get a locale dependent file        v.5.5
 
 void showz_userguide(cchar *context = 0);                                        //  show user guide in new process
 void showz_logfile();                                                            //  show log file in popup window      v.5.2

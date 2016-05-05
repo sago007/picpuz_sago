@@ -49,7 +49,6 @@
    proc file functions     parse data from various /proc files
    zsleep                  sleep for any amount of time (e.g. 0.1 seconds)
    global_lock             lock/unlock a global resource (all processes/threads)
-   resource_lock           lock/unlock a resource within a process + threads
    zget_locked, etc.       safely access parameters from multiple threads
    start_detached_thread   simplified method to start a detached thread
    synch_threads           make threads pause and resume together
@@ -481,53 +480,6 @@ void tracedump()
 
 /**************************************************************************/
 
-//  This function will restart the current program with root privileges,
-//  if the correct (sudo) password is given. It does not return.
-//  "argc" and "argv" are passed in the command line.
-//  Use the original argc and argv (optional, may be omitted).
-//  argv[0] is omitted to avoid passing the program name twice.
-//  argv[] parameters are enclosed in quotes to avoid gksu eating them.          //  bugfix           5.6
-
-void beroot(int argc, char *argv[])
-{
-   int      cc1, cc2, ii, err;
-   char     command[1000];
-
-   if (getuid() == 0) return;                                                    //  already root
-
-   strcpy(command,"which gksu > /dev/null 2>&1");                                //  Debian
-   err = system(command);
-   strcpy(command,"gksu \"");
-   if (err) {
-      strcpy(command,"which beesu > /dev/null 2>&1");                            //  Fedora, just to be different
-      err = system(command);
-      strcpy(command,"beesu \"");
-   }
-   if (err) {
-      printz("*** please install gksu or beesu or restart using sudo \n");
-      zpopup_message(0,"please install gksu or beesu or restart using sudo",0);
-      exit(0);
-   }
-
-   cc1 = strlen(command);                                                        //  gksu  (or)  beesu
-
-   cc2 = readlink("/proc/self/exe",command+cc1,990);
-   if (cc2 <= 0) zappcrash("readlink /proc/self/exe: %s",strerror(errno));       //  6.0
-   command[cc1+cc2] = 0;                                                         //  gksu or beesu <my-program>
-
-   for (ii = 1; ii < argc; ii++)                                                 //  append command line parameters
-      strncatv(command,990," ",argv[ii],null);
-
-   strcat(command,"\" &");                                                       //  return immediately
-
-   printz("%s \n",command);
-   err = system(command);
-   exit(0);
-}
-
-
-/**************************************************************************/
-
 //  get time in real seconds (since 2000.01.01 00:00:00)
 //  (microsecond resolution until at least 2030)
 
@@ -750,38 +702,6 @@ int global_unlock(int fd, cchar *lockfile)
 }
 
 
-/**************************************************************************/
-
-//  lock or unlock a resource
-//  does not spin or wait, usable within or across threads
-//  (mutex_lock() cannot be used within one thread, e.g. GTK main loop)
-//  return 0 if already locked, otherwise lock and return 1
-
-mutex_t resource_lock_lock = PTHREAD_MUTEX_INITIALIZER;
-
-int resource_lock(int &resource)                                                 //  6.0
-{
-   mutex_lock(&resource_lock_lock);
-   if (resource) {
-      mutex_unlock(&resource_lock_lock);
-      printz("resource locked \n");                                              //  fail, already locked
-      return 0;
-   }
-   resource = 1;
-   mutex_unlock(&resource_lock_lock);
-   return 1;                                                                     //  locked OK
-}
-
-//  unlock a locked resource
-
-void resource_unlock(int &resource)
-{
-   mutex_lock(&resource_lock_lock);
-   if (resource != 1) zappcrash("resource not locked");                          //  bug, not locked
-   resource = 0;                                                                 //  unlock
-   mutex_unlock(&resource_lock_lock);
-   return;
-}
 
 
 /**************************************************************************/
@@ -1409,65 +1329,6 @@ void * cpu_profile_timekeeper(void *)
    }
 
    cpu_profile_kill = 0;
-   pthread_exit(0);
-}
-
-
-/**************************************************************************/
-
-//  Returns hard page fault rate in faults/second.
-//  First call starts a thread that runs every 2 seconds and keeps a
-//  weighted average of hard fault rate for the last few intervals.
-
-namespace pagefaultrate_names {
-   int      ftf = 1;
-   int      samples = 0;
-   int      faultrate = 0;
-   double   time1, time2;
-   void * threadfunc(void *);
-}
-
-int pagefaultrate()                                                              //  5.8
-{
-   using namespace pagefaultrate_names;
-
-   if (ftf) {
-      ftf = 0;
-      start_detached_thread(threadfunc,0);
-      time1 = get_seconds();
-   }
-
-   return faultrate;
-}
-
-void * pagefaultrate_names::threadfunc(void *)
-{
-   using namespace pagefaultrate_names;
-
-   FILE        *fid;
-   char        *pp, buff[200];
-   double      pfs1, pfs2, fps, elaps;
-
-   while (true)
-   {
-      sleep(2);
-
-      time2 = get_seconds();
-      elaps = time2 - time1;
-      time1 = time2;
-
-      fid = fopen("/proc/self/stat","r");
-      if (! fid) break;
-      pp = fgets(buff,200,fid);
-      fclose(fid);
-      if (! pp) break;
-      pp = strchr(pp,')');                                                       //  closing ')' after (short) filename
-      if (pp) parseprocrec(pp+1,10,&pfs1,11,&pfs2,null);
-      fps = (pfs1 + pfs2) / elaps;
-      faultrate = 0.7 * faultrate + 0.3 * fps;
-   }
-
-   printz("pagefaultrate() failure \n");
    pthread_exit(0);
 }
 

@@ -92,8 +92,6 @@ void zappcrash(cchar *format, ...);                                             
 void trace(cchar *file, cchar *func, int line, void *addr);                      //  implements TRACE macro
 void tracedump();                                                                //  dump program trace data
 
-void beroot(int argc = 0, char *argv[] = 0);                                     //  restart image as root if password OK
-
 double get_seconds();                                                            //  seconds since 2000.01.01
 void compact_time(const time_t &DT, char *compactDT);                             //  time_t DT to yyyymmddhhmmss
 void pretty_datetime(const time_t &DT, char *prettyDT);                           //  time_t DT to yyyy-mm-dd hh:mm:ss
@@ -101,7 +99,6 @@ int  parseprocrec(char *prec, int field, double *value, ...);                   
 void zsleep(double dsecs);                                                       //  sleep specified seconds
 int  global_lock(cchar *lockfile);                                               //  obtain exclusive lock, multi-process
 int  global_unlock(int fd, cchar *lockfile);                                     //  release the lock
-int  resource_lock(int &resource);                                               //  simple lock/unlock usable with GTK
 void resource_unlock(int &resource);                                             //  (never waits, returns lock status)
 int  zget_locked(int &param);                                                    //  lock and get multi-thread parameter
 void zput_locked(int &param, int value);                                         //  put and unlock multi-thread parameter
@@ -136,7 +133,6 @@ inline void cpu_profile_enter(int fnum)                                         
 {  cpu_profile_timer = cpu_profile_elapsed;  }
 inline void cpu_profile_exit(int fnum)                                           //  at exit from measured code block
 {  cpu_profile_table[fnum] += cpu_profile_elapsed - cpu_profile_timer; }
-int pagefaultrate();                                                             //  monitor own process hard fault rate
 
 //  string macros and functions ===========================================
 

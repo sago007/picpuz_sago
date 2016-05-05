@@ -599,7 +599,7 @@ void init_puzzle(int newp)
    if (iPixbuf) g_object_unref(iPixbuf);
    iPixbuf = gdk_pixbuf_new_from_file(imagefile.c_str(),&gerror);                        //  create pixbuf from image file
    if (!iPixbuf) {
-      zmessageACK(win1,ZTX("image type not recognized:\n %s"),imagefile);
+      zmessageACK(win1,ZTX("image type not recognized:\n %s"),imagefile.c_str());
       clear_puzzle();
       return;
    }

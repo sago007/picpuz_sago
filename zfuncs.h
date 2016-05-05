@@ -96,22 +96,6 @@ char * fgets_trim(char * buff, int maxcc, FILE *, int bf = 0);                  
 
 
 
-//  search and sort functions =============================================
-
-int bsearch(int seekint, int nn, int list[]);                                    //  binary search sorted list[nn]
-int bsearch(cchar *seekrec, cchar *allrecs, int recl, int nrecs);                //  binary search sorted records
-int bsearch(cchar *seekrec, cchar **allrecs, int N, int nrecs);                  //  binary search of sorted pointers to recs
-
-typedef int HeapSortUcomp(cchar *rec1, cchar *rec2);                             //  return -1/0/+1 if rec1 </=/> rec2
-void HeapSort(int vv[], int nn);                                                 //  Heap Sort - integer
-void HeapSort(float vv[], int nn);                                               //  Heap Sort - float
-void HeapSort(double vv[], int nn);                                              //  Heap Sort - double
-void HeapSort(char *vv[], int nn);                                               //  Heap Sort - char *, ascending order
-void HeapSort(char *vv1[], char *vv2[], int nn);                                 //  Heap Sort - parallel char *, ascending order
-void HeapSort(char *vv[], int nn, HeapSortUcomp);                                //  Heap Sort - char *, user-defined order
-void HeapSort(char *recs, int RL, int NR, HeapSortUcomp);                        //  Heap Sort - records, user-defined order
-
-int MemSort(char * RECS, int RL, int NR, int KEYS[][3], int NK);                 //  memory sort, records with multiple keys
 
 
 struct  pvlist {

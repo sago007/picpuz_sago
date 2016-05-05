@@ -39,6 +39,13 @@ static void zpopup_message(int secs, cchar *format, ...);                       
 static void zappcrash(cchar *format, ...);                                              //  crash with popup message in text window
 
 
+static void start_detached_thread(void * tfunc(void *), void * arg);                    //  start detached thread function
+static int shell_quiet(cchar *command, ...);                                            //  format/run shell command, return status
+
+static char * command_output(int &contx, cchar *command, ...);                          //  get shell command output
+static int command_status(int contx);                                                   //  get exit status of command
+
+
 /**************************************************************************
 
    Table of Contents
@@ -528,76 +535,6 @@ void zsleep(double dsecs)
 }
 
 
-/**************************************************************************/
-
-//  Lock or unlock a multi-process multi-thread resource.
-//  Only one process/thread may possess a given lock.
-//  A reboot or process exit or crash releases the lock.
-//  fd = global_lock(lockfile) returns fd > 0 if success, -1 otherwise.
-
-int global_lock(cchar *lockfile)                                                 //  5.2
-{
-   int       err, fd;
-
-   fd = open(lockfile,O_RDWR|O_CREAT,0666);                                      //  open or create the lock file
-   if (fd < 0) {
-      printz("*** global_lock(), %s \n",strerror(errno));
-      return -1;
-   }
-
-   err = flock(fd,LOCK_EX|LOCK_NB);                                              //  request exclusive non-blocking lock
-   if (err) {
-      close(fd);
-      return -1;
-   }
-
-   return fd + 1;                                                                //  return value is >= 1
-}
-
-
-int global_unlock(int fd, cchar *lockfile)
-{
-   int err = close(fd-1);
-   remove(lockfile);
-   if (err < 0) return -1;
-   else return 1;
-}
-
-
-
-
-/**************************************************************************/
-
-//  Safely access and update parameters from multiple threads.
-//  A mutex lock is used to insure one thread at a time has access to the parameter.
-//  Many parameters can be used but there is only one mutex lock.
-
-mutex_t zget_lock = PTHREAD_MUTEX_INITIALIZER;
-
-int zget_locked(int &param)                                                      //  lock and return parameter
-{
-   mutex_lock(&zget_lock);
-   return param;
-}
-
-void zput_locked(int &param, int value)                                          //  set and unlock parameter
-{
-   param = value;
-   mutex_unlock(&zget_lock);
-   return;
-}
-
-int zadd_locked(int &param, int incr)                                            //  lock, increment, unlock, return
-{
-   int      retval;
-
-   mutex_lock(&zget_lock);
-   retval = param + incr;
-   param = retval;
-   mutex_unlock(&zget_lock);
-   return retval;
-}
-
 
 /**************************************************************************/
 
@@ -619,33 +556,6 @@ void start_detached_thread(void * threadfunc(void *), void * arg)
    return;
 }
 
-
-/**************************************************************************/
-
-//  Synchronize execution of multiple threads.
-//  Simultaneously resume NT calling threads.
-//  from main():        synch_threads(NT)    /* setup to synch NT threads */
-//  from each thread:   synch_threads()      /* suspend, resume simultaneously */
-//
-//  Each calling thread will suspend execution until all threads have suspended,
-//  then they will all resume execution at the same time. If NT is greater than
-//  the number of calling threads, the threads will never resume.
-
-void synch_threads(int NT)
-{
-   static pthread_barrier_t   barrier;
-   static int                 bflag = 0;
-
-   if (NT) {                                                                     //  main(), initialize
-      if (bflag) pthread_barrier_destroy(&barrier);
-      pthread_barrier_init(&barrier,nullptr,NT);
-      bflag = 1;
-      return;
-   }
-
-   pthread_barrier_wait(&barrier);                                               //  thread(), wait for NT threads
-   return;                                                                       //  unblock
-}
 
 
 /**************************************************************************/
@@ -753,31 +663,6 @@ namespace shell_asynch_names {
    mutex_t  mlock = PTHREAD_MUTEX_INITIALIZER;
 }
 
-int shell_asynch(cchar *Fcommand, ...)                                           //  5.5
-{
-   using namespace shell_asynch_names;
-
-   void * shell_asynch_thread(void *);
-
-   va_list     arglist;
-   static int  ii;
-
-   mutex_lock(&mlock);                                                           //  block other callers
-
-   for (ii = 0; ii < 10; ii++)
-      if (command[ii] == 0) break;
-   if (ii == 10) zappcrash("shell_asynch > 10 calls");
-
-   command[ii] = (char *) zmalloc(2000);                                         //  allocate memory
-
-   va_start(arglist,Fcommand);                                                   //  format command
-   vsnprintf(command[ii],2000,Fcommand,arglist);
-   va_end(arglist);
-
-   start_detached_thread(shell_asynch_thread,&ii);                               //  pass command to thread
-   status[ii] = -1;                                                              //  status = busy
-   return ii;                                                                    //  return handle
-}
 
 void * shell_asynch_thread(void *arg)                                            //  thread function
 {
@@ -801,16 +686,6 @@ void * shell_asynch_thread(void *arg)                                           
    return 0;
 }
 
-int shell_asynch_status(int handle)                                              //  get command status
-{
-   using namespace shell_asynch_names;
-
-   int ii = handle;
-   if (status[ii] == -1) return -1;                                              //  return busy status
-   zfree(command[ii]);                                                           //  free memory
-   command[ii] = 0;
-   return status[ii];                                                            //  return completion status
-}
 
 
 /**************************************************************************
@@ -872,80 +747,6 @@ int command_status(int contx)                                                   
    return WEXITSTATUS(err);                                                      //  special BS for subprocess
 }
 
-int command_kill(int contx)                                                      //  kill output before completion   5.5
-{
-   FILE     *fid;
-   if (! CO_contx[contx]) return 0;                                              //  context already closed          5.8
-   fid = CO_contx[contx] - 1000;
-   CO_status[contx] = pclose(fid);                                               //  close context and set status
-   CO_contx[contx] = 0;                                                          //  mark context free
-   return 0;
-}
-
-
-/**************************************************************************/
-
-//  Signal a running subprocess by name (name of executable or shell command).
-//  Signal is "pause", "resume" or "kill". If process is paused, kill may not work,
-//  so issue resume first if process is paused.
-
-int signalProc(cchar *pname, cchar *signal)
-{
-   pid_t       pid;
-   FILE        *fid;
-   char        buff[100], *pp;
-   int         err, nsignal = 0;
-
-   snprintf(buff,100,"ps -C %s h o pid",pname);
-   fid = popen(buff,"r");                                                        //  popen() instead of system()
-   if (! fid) return 2;
-   pp = fgets(buff,100,fid);
-   pclose(fid);
-   if (! pp) return 4;
-
-   pid = atoi(buff);
-   if (! pid) return 5;
-
-   if (strmatch(signal,"pause")) nsignal = SIGSTOP;
-   if (strmatch(signal,"resume")) nsignal = SIGCONT;
-   if (strmatch(signal,"kill")) nsignal = SIGKILL;
-
-   err = kill(pid,nsignal);
-   return err;
-}
-
-
-/**************************************************************************/
-
-//  run a command or program as root user
-//  sucomm:  root user access command, "su" or "sudo"
-//  command:  shell command or filespec of the program to start
-//  returns 0 if successfully started, else returns an error code
-
-int runroot(cchar *sucomm, cchar *command)
-{
-   char     xtcommand[500];
-   int      err;
-
-   if (strmatch(sucomm,"sudo"))
-   {
-      snprintf(xtcommand,499,"xterm -geometry 40x3 -e sudo -S %s",command);
-      err = system(xtcommand);
-      if (err) err = WEXITSTATUS(err);                                           //  special BS for subprocesses     5.8
-      return err;
-   }
-
-   if (strmatch(sucomm,"su"))
-   {
-      snprintf(xtcommand,499,"xterm -geometry 40x3 -e su -c %s",command);
-      err = system(xtcommand);
-      if (err) err = WEXITSTATUS(err);
-      return err;
-   }
-
-   return -1;
-}
-
 
 /**************************************************************************/
 
@@ -967,124 +768,6 @@ char * fgets_trim(char *buff, int maxcc, FILE *fid, int bf)
    return pp;
 }
 
-
-/**************************************************************************/
-
-//  Return 1 if both filespecs have the same directory, else return 0.
-//  Both directories must be specified, at least one with ending '/'
-//  (true if a file name is present)
-
-int samedirk(cchar *file1, cchar *file2)                                         //  5.9
-{
-   cchar    *p1, *p2;
-   int      cc1, cc2, cc;
-
-   p1 = strrchr(file1,'/');                                                      //  /dir1/dir2
-   p2 = strrchr(file2,'/');                                                      //  /dir1/dir2/file
-   cc1 = cc2 = 0;
-   if (p1) cc1 = p1 - file1;                                                     //  /dir1/dir2/file
-   if (p2) cc2 = p2 - file2;                                                     //  |         |
-   if (cc2 > cc1) cc = cc2;                                                      //  0         cc
-   else cc = cc1;
-   if (cc == 0) return 0;
-   if (strmatchN(file1,file2,cc)) return 1;
-   return 0;
-}
-
-
-/**************************************************************************
-
-   Parse a pathname (filespec) and return its components.
-   Returned strings are allocated in static memory (no zfree needed).
-   Missing components are returned as null pointers.
-
-   input ppath         outputs
-
-   /name1/name2/       directory /name1/name2/ with no file
-   /name1/name2        directory /name1/name2/ if name2 a directory,
-                       otherwise directory /name1/ and file name2
-   /name1/name2.xxx    if .xxx < 8 chars, returns file name2 and ext .xxx,
-                       otherwise returns file name2.xxx and no ext
-
-   returns 0 if no error, else 1
-
-***************************************************************************/
-
-int parsefile(cchar *ppath, char **pdirk, char **pfile, char **pext)
-{
-   STATB          statb;
-   static char    dirk[1000], file[200], ext[8];
-   char           *pp;
-   int            err, cc1, cc2;
-
-   *pdirk = *pfile = *pext = nullptr;
-
-   cc1 = strlen(ppath);
-   if (cc1 > 999) return 1;                                                      //  ppath too long
-
-   strcpy(dirk,ppath);
-   *pdirk = dirk;
-
-   err = stat(dirk,&statb);                                                      //  have directory only
-   if (! err && S_ISDIR(statb.st_mode)) return 0;
-
-   pp = (char *) strrchr(dirk,'/');
-   if (! pp) return 1;                                                           //  illegal
-
-   pp++;
-   cc2 = pp - dirk;
-   if (cc2 < 2 || cc2 == cc1) return 0;                                          //  have /xxxx  or  /xxxx/
-
-   if (strlen(pp) > 199) return 1;                                               //  filename too long
-
-   strcpy(file,pp);                                                              //  file part
-   *pfile = file;
-   *pp = 0;                                                                      //  remove from dirk part
-
-   pp = (char *) strrchr(file,'.');
-   if (! pp || strlen(pp) > 7) return 0;                                         //  file part, no .ext
-
-   strcpy(ext,pp);                                                               //  .ext part
-   *pext = ext;
-   *pp = 0;                                                                      //  remove from file part
-   return 0;
-}
-
-
-/**************************************************************************/
-
-//  Check if a directory exists. If not, ask user if it should be created.
-//  Returns 0 if OK or +N if error or user refused to create.
-//  The user is notified of failure, no other message needed.
-
-int  check_create_dir(const char *path)
-{
-   int      err, yn;
-   STATB    statbuf;
-
-   err = stat(path,&statbuf);                                                    //  check status
-   if (! err) {
-      if (S_ISDIR(statbuf.st_mode)) return 0;                                    //  exists, directory, OK
-      else {
-         zmessageACK(0,"%s \n %s",path,strerror(ENOTDIR));                       //  exists, not a directory
-         return ENOTDIR;
-      }
-   }
-
-   if (errno != ENOENT) {
-      zmessageACK(0,"%s \n %s",path,strerror(errno));                            //  error other than missing
-      return errno;
-   }
-
-   yn = zmessageYN(0,ZTX("create directory? \n %s"),path);                       //  ask to create
-   if (! yn) return ENOENT;
-
-   err = shell_ack("mkdir -p -m 0750 %s",path);                                  //  create. rwx, rx, no access
-   if (! err) return 0;
-
-   zmessageACK(0,"%s \n %s",path,strerror(errno));                               //  failed to create
-   return errno;
-}
 
 
 /**************************************************************************

@@ -80,29 +80,10 @@
 
                                              //  get disk temp, e.g. "/dev/sda"     v.5.9
 void zsleep(double dsecs);                                                       //  sleep specified seconds
-int  global_lock(cchar *lockfile);                                               //  obtain exclusive lock, multi-process
-int  global_unlock(int fd, cchar *lockfile);                                     //  release the lock
-void resource_unlock(int &resource);                                             //  (never waits, returns lock status)
-int  zget_locked(int &param);                                                    //  lock and get multi-thread parameter
-void zput_locked(int &param, int value);                                         //  put and unlock multi-thread parameter
-int  zadd_locked(int &param, int incr);                                          //  increment multi-thread parameter
 
-void start_detached_thread(void * tfunc(void *), void * arg);                    //  start detached thread function
-void synch_threads(int NT = 0);                                                  //  synchronize NT threads
 
-int shell_quiet(cchar *command, ...);                                            //  format/run shell command, return status
 int shell_ack(cchar *command, ...);                                              //   ""  + popup an error message if error
-int shell_asynch(cchar *command, ...);                                           //  start shell command, return immediately
-int shell_asynch_status(int handle);                                             //  get status of asynch shell command
-char * command_output(int &contx, cchar *command, ...);                          //  get shell command output
-int command_status(int contx);                                                   //  get exit status of command
-int command_kill(int contx);                                                     //  kill command before completion
-int signalProc(cchar * pname, cchar * signal);                                   //  pause/resume/kill subprocess
-int runroot(cchar *sucomm, cchar *command);                                      //  run command as root via su or sudo
 char * fgets_trim(char * buff, int maxcc, FILE *, int bf = 0);                   //  fgets + trim trailing \n \r (blanks)
-int samedirk(cchar *file1, cchar *file2);                                        //  returns 1 if files in same directory
-int parsefile(cchar *path, char **dir, char **file, char **ext);                 //  parse a filespec
-int check_create_dir(const char *path);                                                //  check if directory exists, ask to create
 
 //  measure CPU time spent in a function or code block within a function
 

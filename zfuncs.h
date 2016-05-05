@@ -365,7 +365,6 @@ int  popup_image(cchar *imagefile, GtkWindow *parent, int Fnewin, int size);    
 //  file chooser dialogs for one file or multiple files
 
 std::string zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
-char ** zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
 
 //  print an image file, choosing printer, paper, orientation, margins, and scale
 

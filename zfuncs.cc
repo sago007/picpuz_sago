@@ -76,6 +76,9 @@ static void HeapSort(char *vv1[], char *vv2[], int nn);                         
 static int lrandz();                                                                    //  built-in seed
 
 
+static std::vector<std::string> zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
+
+
 /**************************************************************************
 
    Table of Contents
@@ -7570,10 +7573,9 @@ std::string zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *init
    if (! strmatchV(action,"file","save","folder","create folder",nullptr))
       zappcrash("zgetfile() call error: %s",action);
 
-   char **flist = zgetfiles(title,parent,action,initfile,hidden);                //  parent added   6.1
-   if (! flist) return 0;
-   std::string file = *flist;
-   zfree(flist);
+   std::vector<std::string> flist = zgetfiles(title,parent,action,initfile,hidden);                //  parent added   6.1
+   if (flist.empty()) return 0;
+   std::string file = flist.at(0);
    return file;
 }
 
@@ -7581,8 +7583,9 @@ std::string zgetfile(cchar *title, GtkWindow *parent, cchar *action, cchar *init
 //  version for 1 or more files
 //  returns a list of filespecs (char **) terminated with null
 
-char ** zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *initfile, int hidden)
+std::vector<std::string> zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *initfile, int hidden)
 {
+	std::vector<std::string> flist;
    using namespace zfuncs;
 
    void zgetfile_preview(GtkWidget *dialog, GtkWidget *pvwidget);                //  private functions
@@ -7599,7 +7602,6 @@ char ** zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *initfil
    char        *pdir, *pfile;
    int         ii, err, NF, setfname = 0;
    int         fcstat, bcode = 0, hide = 1;
-   char        *file1, *file2, **flist = 0;
    STATB       fstat;
 
    zthreadcrash();                                                               //  thread usage not allowed
@@ -7711,16 +7713,14 @@ char ** zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *initfil
          if (! gslist) continue;
 
          NF = g_slist_length(gslist);                                            //  no. selected files
-         flist = (char **) zmalloc((NF+1)*sizeof(char *));                       //  allocate returned list
+		 flist.clear();
 
          for (ii = 0; ii < NF; ii++)
          {                                                                       //  process selected files
-            file1 = (char *) g_slist_nth_data(gslist,ii);
-            file2 = zstrdup(file1);                                              //  re-allocate memory
-            flist[ii] = file2;
-            g_free(file1);
+            const char* file1 = (const char *) g_slist_nth_data(gslist,ii);
+            flist.push_back(file1);
+			printf("%s\n", file1);
          }
-         flist[ii] = 0;                                                          //  EOL marker
          break;
       }
 

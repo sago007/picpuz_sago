@@ -568,25 +568,3 @@ class xstring
       int getcc() const { return xcc; }                                          //  return string length
 };
 
-
-//  hash table class ======================================================
-
-class HashTab
-{
-   static int trys1;                                                             //  insert trys
-   static int trys2;                                                             //  find/delete trys
-   int     cap;                                                                  //  table capacity
-   int     count;                                                                //  strings contained
-   int     cc;                                                                   //  string length
-   char  * table;                                                                //  table[cc][cap]
-public:
-   HashTab(int cc, int cap);                                                     //  constructor
-   ~HashTab();                                                                   //  destructor
-   int Add(cchar * string);                                                      //  add a new string
-   int Del(cchar * string);                                                      //  delete a string
-   int Find(cchar * string);                                                     //  find a string
-   int GetCount() { return count; };                                             //  get string count
-   int GetNext(int & first, char * string);                                      //  get first/next string
-   int Dump();                                                                   //  dump hash table
-};
-

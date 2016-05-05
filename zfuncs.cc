@@ -1336,7 +1336,8 @@ int parsefile(cchar *ppath, char **pdirk, char **pfile, char **pext)
 
 int renamez(cchar *file1, cchar *file2)                                          //  5.8
 {
-   char     *pp1, *pp2;
+   const char     *pp1;
+   const char     *pp2;
    int      err, Frename = 0;
 
    if (*file1 != '/' || *file2 != '/') return 1;                                 //  not absolute pathnames
@@ -1345,9 +1346,7 @@ int renamez(cchar *file1, cchar *file2)                                         
    pp2 = strchr((char *) file2+1,'/');
    if (! pp1 || ! pp2) return 2;
 
-   *pp1 = *pp2 = 0;
    if (strmatch(file1,file2)) Frename = 1;
-   *pp1 = *pp2 = '/';
 
    if (Frename) {                                                                //  same top directory
       err = rename(file1,file2);
@@ -1366,7 +1365,7 @@ int renamez(cchar *file1, cchar *file2)                                         
 //  Returns 0 if OK or +N if error or user refused to create.
 //  The user is notified of failure, no other message needed.
 
-int  check_create_dir(char *path)
+int  check_create_dir(const char *path)
 {
    int      err, yn;
    STATB    statbuf;

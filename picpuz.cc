@@ -430,7 +430,6 @@ void m_resume()
    FILE        *fid;
    int         stat, row1, col1, row2, col2, ii;
    string      newfile;
-   char        *pp;
 
    if (puzzle_status()) return;                                                  //  do not discard
    clear_puzzle();
@@ -446,7 +445,7 @@ void m_resume()
 
    newfile = (char *) malloc(XFCC);
    newfile.resize(XFCC);
-   pp = fgets_trim(&newfile[0],newfile.length(), fid, 1);                                        //  read image file name
+   const char* pp = fgets_trim(&newfile[0],newfile.length(), fid, 1);                                        //  read image file name
    if (! pp) goto badfile;
 
    imagefile = newfile;
@@ -1046,7 +1045,7 @@ void stbar_update()
 {
    char     message[50];
 
-   sprintf(message,ZTX("tiles home: %d/%d"),Nhome,Ntiles);
+   snprintf(message,sizeof(message), ZTX("tiles home: %d/%d"),Nhome,Ntiles);
    if (Mstate > 1) snprintf(message,49,"%s  %s",message,ZTX("1st tile selected"));
    stbar_message(stbar,message);
    return;

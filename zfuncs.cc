@@ -78,6 +78,10 @@ static int lrandz();                                                            
 
 static std::vector<std::string> zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
 
+//  write text to popup window, shell command to popup window
+
+static GtkWidget * write_popup_text(cchar *action, cchar *text = 0, int ww = 0, int hh = 0, GtkWidget *parent = 0);
+static int popup_command(cchar *command, int ww = 400, int hh = 300, GtkWidget *parent = 0, int top = 0);
 
 /**************************************************************************
 

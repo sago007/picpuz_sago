@@ -344,10 +344,6 @@ int zdialog_inputs(cchar *action);                                              
 int zdialog_save_inputs(zdialog *zd);                                            //  save zdialog input fields when finished
 int zdialog_restore_inputs(zdialog *zd);                                         //  restore zdialog inputs from prior use
 
-//  write text to popup window, shell command to popup window
-
-GtkWidget * write_popup_text(cchar *action, cchar *text = 0, int ww = 0, int hh = 0, GtkWidget *parent = 0);
-int popup_command(cchar *command, int ww = 400, int hh = 300, GtkWidget *parent = 0, int top = 0);
 
 //  popup message dialogs
 

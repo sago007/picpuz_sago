@@ -342,10 +342,3 @@ void print_image_file(GtkWidget *parent, cchar *imagefile);
 typedef void drag_drop_func(int x, int y, const char *text);                           //  user function, get drag_drop text
 void drag_drop_connect(GtkWidget *window, drag_drop_func);                       //  connect window to user function
 
-//  miscellaneous GDK/GTK functions
-
-PIXBUF * get_thumbnail(cchar *fpath, int size);                                  //  get sized thumbnail for image file
-GdkCursor * zmakecursor(cchar *iconfile);                                        //  make a cursor from an image file
-PIXBUF * gdk_pixbuf_rotate(PIXBUF *, float deg, int alfa = 0);                   //  rotate pixbuf through any angle
-PIXBUF * gdk_pixbuf_stripalpha(const PIXBUF *pixbuf);                                  //  strip alpha channel from pixbuf
-PIXBUF * text_pixbuf(cchar *text, cchar *font, int fsize, GtkWidget *);          //  create pixbuf with text using font

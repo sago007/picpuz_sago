@@ -75,6 +75,31 @@ static void HeapSort(char *vv1[], char *vv2[], int nn);                         
 
 static int lrandz();                                                                    //  built-in seed
 
+/**************************************************************************/
+
+//  create vertical menu/toolbar in vertical packing box                         //  v.5.5
+
+struct vmenuent {                                                                //  menu data from caller
+   cchar       *name;                                                            //  menu name, text
+   cchar       *icon;                                                            //  opt. icon file name
+   cchar       *desc;                                                            //  description (mouse hover popup)
+   cbFunc      *func;                                                            //  callback func (GtkWidget *, cchar *arg)
+   cchar       *arg;                                                             //  callback arg
+   PIXBUF      *pixbuf;                                                          //  icon pixbuf or null
+   PangoLayout *playout1, *playout2;                                             //  normal and bold menu text
+   int         namex, namey;                                                     //  menu name position in layout
+   int         iconx, icony;                                                     //  menu icon position
+   int         ylo, yhi;                                                         //  menu height limits
+   int         iconww, iconhh;                                                   //  icon width and height
+};
+
+struct Vmenu {
+   GtkWidget   *vbox;                                                            //  parent window
+   GtkWidget   *layout;                                                          //  drawing window
+   int         xmax, ymax;                                                       //  layout size                     v.5.8
+   int         mcount;                                                           //  menu entry count
+   vmenuent    menu[100];
+};
 
 static std::vector<std::string> zgetfiles(cchar *title, GtkWindow *parent, cchar *action, cchar *file, int hidden = 0);
 
@@ -4267,155 +4292,6 @@ namespace Vmenunames
    void  wpaint(GtkWidget *, cairo_t *, Vmenu *);                                //  window repaint - draw event
    void  mouse_event(GtkWidget *, GdkEventButton *, Vmenu *);                    //  mouse event function
    void  paint_menu(cairo_t *cr, Vmenu *vbm, int me, int hilite);                //  paint menu entry, opt. highlight
-}
-
-
-Vmenu *Vmenu_new(GtkWidget *vbox)                                                //  revised 5.7
-{
-   using namespace Vmenunames;
-
-   int      cc;
-
-   zthreadcrash();
-
-   cc = sizeof(Vmenu);
-   Vmenu *vbm = (Vmenu *) zmalloc(cc);
-   memset(vbm,0,cc);
-   vbm->vbox = vbox;
-   vbm->layout = gtk_layout_new(0,0);
-   vbm->mcount = 0;
-   gtk_box_pack_start(GTK_BOX(vbox),vbm->layout,1,1,0);
-   vbm->xmax = vbm->ymax = 10;                                                   //  layout size                        5.8
-
-   pattrlist = pango_attr_list_new();
-   pbackground = pango_attr_background_new(BGCOLOR);
-   pango_attr_list_change(pattrlist,pbackground);
-
-   pfont1 = pango_font_description_from_string(menufont1);
-   pfont2 = pango_font_description_from_string(menufont2);
-
-   gtk_widget_add_events(vbm->layout,GDK_BUTTON_PRESS_MASK);
-   gtk_widget_add_events(vbm->layout,GDK_BUTTON_RELEASE_MASK);
-   gtk_widget_add_events(vbm->layout,GDK_POINTER_MOTION_MASK);
-   gtk_widget_add_events(vbm->layout,GDK_LEAVE_NOTIFY_MASK);
-   G_SIGNAL(vbm->layout,"button-press-event",mouse_event,vbm);
-   G_SIGNAL(vbm->layout,"button-release-event",mouse_event,vbm);
-   G_SIGNAL(vbm->layout,"motion-notify-event",mouse_event,vbm);
-   G_SIGNAL(vbm->layout,"leave-notify-event",mouse_event,vbm);
-   G_SIGNAL(vbm->layout,"draw",wpaint,vbm);
-
-   return vbm;
-}
-
-
-void Vmenu_add(Vmenu *vbm, cchar *name, cchar *icon, int iconww, int iconhh, cchar *desc, cbFunc func, cchar *arg)
-{
-   using namespace Vmenunames;
-
-   int         me, cc1, cc2, xpos, ww, hh;
-   char        iconpath[200], *mdesc, *name__;
-   cchar       *blanks = "                    ";                                 //  20 blanks
-   PIXBUF      *pixbuf;
-   GError      *gerror = 0;
-
-   PangoLayout             *playout;
-   PangoFontDescription    *pfont;
-
-   zthreadcrash();
-
-   if (! name && ! icon) return;
-
-   me = vbm->mcount++;                                                           //  track no. menu entries
-
-   if (name) vbm->menu[me].name = zstrdup(name);                                 //  create new menu entry from caller data
-
-   if (icon) {
-      vbm->menu[me].icon = zstrdup(icon);
-      vbm->menu[me].iconww = iconww;                                             //  5.8
-      vbm->menu[me].iconhh = iconhh;
-   }
-
-   if (desc) {                                                                   //  pad description with blanks for looks
-      cc1 = strlen(desc);                                                        //  5.6
-      mdesc = (char *) zmalloc(cc1+3);
-      mdesc[0] = ' ';
-      strcpy(mdesc+1,desc);
-      strcpy(mdesc+cc1+1," ");
-      vbm->menu[me].desc = mdesc;
-   }
-
-   vbm->menu[me].func = func;
-   vbm->menu[me].arg = name;                                                     //  argument is menu name or arg if avail.
-   if (arg) vbm->menu[me].arg = arg;
-
-   vbm->menu[me].pixbuf = 0;
-
-   if (icon) {                                                                   //  if icon is named, get pixbuf
-      *iconpath = 0;
-      strncatv(iconpath,199,zfuncs::zicondir,"/",icon,nullptr);
-      pixbuf = gdk_pixbuf_new_from_file_at_scale(iconpath,iconww,iconhh,1,&gerror);
-      if (pixbuf) vbm->menu[me].pixbuf = pixbuf;
-   }
-
-   if (me == 0) vbm->ymax = margin;                                              //  first menu, top position
-
-   vbm->menu[me].iconx = 0;
-   vbm->menu[me].icony = 0;
-   vbm->menu[me].namex = 0;
-   vbm->menu[me].namey = 0;
-
-   if (icon) {
-      vbm->menu[me].iconx = margin;                                              //     ______
-      vbm->menu[me].icony = vbm->ymax;                                           //    |      |
-      if (name) {                                                                //    | icon | menu name
-         vbm->menu[me].namex = margin + iconww + margin;                         //    |______|
-         vbm->menu[me].namey = vbm->ymax + (iconhh - fontheight) / 2 + 2;
-      }
-      vbm->menu[me].ylo = vbm->ymax;
-      vbm->ymax += iconhh + iconhh / 8;                                          //  position for next menu entry
-      vbm->menu[me].yhi = vbm->ymax;
-      if (margin + iconww > vbm->xmax) vbm->xmax = margin + iconww;              //  keep track of max. layout width
-   }
-
-   else if (name) {
-      vbm->menu[me].namex = margin;                                              //  menu name
-      vbm->menu[me].namey = vbm->ymax;
-      vbm->menu[me].ylo = vbm->ymax;
-      vbm->ymax += fontheight;
-      vbm->menu[me].yhi = vbm->ymax;
-   }
-
-   vbm->menu[me].playout1 = gtk_widget_create_pango_layout(vbm->layout,0);
-   vbm->menu[me].playout2 = gtk_widget_create_pango_layout(vbm->layout,0);
-
-   if (name) {
-      xpos = vbm->menu[me].namex;
-
-      cc1 = strlen(name);                                                        //  prepare menu name with trailing blanks
-      cc2 = 0.3 * cc1 + 3;                                                       //    so normal name longer than bold name
-      if (cc2 > 20) cc2 = 20;                                                    //      otherwise bold not 100% overwritten
-      name__ = zstrdup(name,cc2);
-      strncpy0(name__+cc1,blanks,cc2);
-
-      playout = vbm->menu[me].playout1;                                          //  normal font
-      pfont = pfont1;
-      pango_layout_set_attributes(playout,pattrlist);
-      pango_layout_set_font_description(playout,pfont);
-      pango_layout_set_text(playout,name__,-1);                                  //  compute layout
-      pango_layout_get_pixel_size(playout,&ww,&hh);                              //  pixel width and height of layout
-
-      playout = vbm->menu[me].playout2;                                          //  bold font
-      pfont = pfont2;
-      pango_layout_set_attributes(playout,pattrlist);
-      pango_layout_set_font_description(playout,pfont);
-      pango_layout_set_text(playout,name,-1);                                    //  compute layout
-      pango_layout_get_pixel_size(playout,&ww,&hh);                              //  pixel width and height of layout
-      if (xpos + ww > vbm->xmax) vbm->xmax = xpos + ww;                          //  keep track of max. layout width
-   }
-
-   gtk_widget_set_size_request(vbm->layout,vbm->xmax+margin,0);                  //  add right margin to layout width
-
-   return;
 }
 
 

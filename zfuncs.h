@@ -207,36 +207,7 @@ void popup_menu(GtkWidget *, GtkWidget *popmenu);                               
 typedef void gmenuz_cbfunc(cchar *menu);                                         //  caller-supplied callback function
 void gmenuz(GtkWidget *parent, cchar *title, cchar *ufile, gmenuz_cbfunc);       //  show window, handle mouse drag/click
 
-/**************************************************************************/
 
-//  create vertical menu/toolbar in vertical packing box                         //  v.5.5
-
-struct vmenuent {                                                                //  menu data from caller
-   cchar       *name;                                                            //  menu name, text
-   cchar       *icon;                                                            //  opt. icon file name
-   cchar       *desc;                                                            //  description (mouse hover popup)
-   cbFunc      *func;                                                            //  callback func (GtkWidget *, cchar *arg)
-   cchar       *arg;                                                             //  callback arg
-   PIXBUF      *pixbuf;                                                          //  icon pixbuf or null
-   PangoLayout *playout1, *playout2;                                             //  normal and bold menu text
-   int         namex, namey;                                                     //  menu name position in layout
-   int         iconx, icony;                                                     //  menu icon position
-   int         ylo, yhi;                                                         //  menu height limits
-   int         iconww, iconhh;                                                   //  icon width and height
-};
-
-struct Vmenu {
-   GtkWidget   *vbox;                                                            //  parent window
-   GtkWidget   *layout;                                                          //  drawing window
-   int         xmax, ymax;                                                       //  layout size                     v.5.8
-   int         mcount;                                                           //  menu entry count
-   vmenuent    menu[100];
-};
-
-Vmenu *Vmenu_new(GtkWidget *vbox);                                               //  create new menu in parent vbox
-void Vmenu_add(Vmenu *vbm, cchar *name, cchar *icon,                             //  add menu item with response function
-               int iconww, int iconhh, cchar *desc,
-               cbFunc func, cchar *arg);                                         //  function may be popup_menu()
 
 /**************************************************************************/
 

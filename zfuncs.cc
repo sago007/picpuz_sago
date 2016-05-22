@@ -447,30 +447,6 @@ void zappcrash(cchar *format, ... )                                             
 }
 
 
-
-
-//  catch fatal signals and produce backtrace dumps on-screen
-
-void sighandler(int signal)
-{
-   const char  *signame = "unknown";
-
-   if (signal == SIGTERM) {
-      printz("process terminated by system \n");
-      exit(1);
-   }
-
-   if (signal == SIGSEGV) signame = "segment fault (bad address)";
-   if (signal == SIGILL) signame = "illegal operation";
-   if (signal == SIGFPE) signame = "arithmetic exception";
-   if (signal == SIGBUS) signame = "bus error (bad address)";
-   if (signal == SIGABRT) signame = "bug detected";
-
-   zappcrash("fatal signal: %s",signame);
-   return;
-}
-
-
 /**************************************************************************/
 
 //  Implement the TRACE macro.                                                   //  5.7

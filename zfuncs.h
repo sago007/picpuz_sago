@@ -58,7 +58,12 @@
 #define  uchar  unsigned char
 #define  cchar  const char
 
+#if 1
+#define  wstrerror(err) strerror(err)
+#else
+// The *nix way
 #define  wstrerror(err) strerror(WEXITSTATUS(err))                               //  get text status for child process
+#endif
 
 #define  STATB  struct stat                                                      //  stat() file status buffer
 

@@ -755,7 +755,7 @@ char * command_output(int &contx, cchar *command, ...)                          
 int command_status(int contx)                                                    //  get command exit status
 {
    int err = CO_status[contx];
-   return err;                                                     
+   return err;                                                    
 }
 
 

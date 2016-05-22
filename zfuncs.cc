@@ -3394,13 +3394,13 @@ namespace gmenuznames
    int         winposx=100, winposy=100, winww=400, winhh=300;                   //  initial popup WRT parent window
 
    struct      menuent {                                                         //  menu entry on popup window
-      int         xpos, ypos, ww, hh;                                            //  layout position, extent
-      char        *menu;                                                         //  text on window on null
-      char        *func;                                                         //  func name for user callback
-      char        *icon;                                                         //  icon file or null
-      PIXBUF      *pixbuf;                                                       //  icon pixbuf or null
-      int         size;                                                          //  icon size or zero
-      int         kill;                                                          //  kill popup window when menu used
+      int         xpos = 0, ypos = 0, ww = 0, hh = 0;                                            //  layout position, extent
+      std::string menu;                                                         //  text on window on null
+      std::string func;                                                         //  func name for user callback
+      std::string icon;                                                         //  icon file or null
+      PIXBUF      *pixbuf = nullptr;                                                       //  icon pixbuf or null
+      int         size = 0;                                                          //  icon size or zero
+      int         kill = 0;                                                          //  kill popup window when menu used
    };
    menuent     menus[200];                                                       //  menu entries
    int         NME = 0;                                                          //  entry count
@@ -3476,7 +3476,8 @@ void gmenuz(GtkWidget *parent, cchar *title, cchar *ufile, gmenuznames::callback
 
             me = NME;                                                            //  new entry
             NME++;                                                               //  entry count
-            memset(&menus[me],0,sizeof(menuent));                                //  clear all menu data
+            //  clear all menu data
+			menus[me] = menuent();
 
             nn = sscanf(pp+5," %d %d ",&xpos,&ypos);                             //  position in popup window
             if (nn != 2) xpos = ypos = 100;
@@ -3488,18 +3489,18 @@ void gmenuz(GtkWidget *parent, cchar *title, cchar *ufile, gmenuznames::callback
 
          if (strmatchN(pp,"menu ",5)) {                                          //  menu text
             if (strlen(pp+5) > 0)
-               menus[me].menu = zstrdup(pp+5);                                   //  get menu text
-            else menus[me].menu = 0;
+               menus[me].menu = pp+5;                                   //  get menu text
+            else menus[me].menu = "";
          }
 
          if (strmatchN(pp,"func ",5)) {                                          //  function name
-            if (strlen(pp+5)) menus[me].func = zstrdup(pp+5);
-            else menus[me].func = 0;
+            if (strlen(pp+5)) menus[me].func = pp+5;
+            else menus[me].func = "";
          }
 
          if (strmatchN(pp,"icon ",5)) {                                          //  menu icon file
             if (strlen(pp+5)) {
-               menus[me].icon = zstrdup(pp+5);
+               menus[me].icon = pp+5;
                gerror = 0;
                pixbuf = gdk_pixbuf_new_from_file(pp+5,&gerror);
                if (! pixbuf && gerror) printz("*** %s \n",gerror->message);
@@ -3573,14 +3574,14 @@ void gmenuznames::wpaint(GtkWidget *, cairo_t *cr)
    using namespace gmenuznames;
 
    PIXBUF      *pixbuf;
-   char        *text, *text2;
+   char			*text2;
    int         xpos, ypos, ww, hh, size, yadd;
 
    for (int me = 0; me < NME; me++)                                              //  loop all menu entries
    {
       xpos = menus[me].xpos;                                                     //  window position
       ypos = menus[me].ypos;
-      text = menus[me].menu;                                                     //  menu text
+      const char* text = menus[me].menu.c_str();                                                     //  menu text
       pixbuf = menus[me].pixbuf;                                                 //  icon
       size = menus[me].size;                                                     //  size
 
@@ -3686,7 +3687,7 @@ void gmenuznames::update_configfile()
 
    for (me = 0; me < NME; me++)                                                  //  write all menu entries to file
    {
-      if (! menus[me].menu && ! menus[me].pixbuf) {                              //  no text and no icon
+      if (menus[me].menu == "" && ! menus[me].pixbuf) {                              //  no text and no icon
          printz("*** gmenuz: skip empty menu entry \n");
          continue;
       }
@@ -3695,11 +3696,11 @@ void gmenuznames::update_configfile()
 
       fprintf(fid,"posn %d %d \n",menus[me].xpos, menus[me].ypos);               //  menu position in window
 
-      if (menus[me].menu)                                                        //  menu text
-         fprintf(fid,"menu %s \n",menus[me].menu);
+      if (menus[me].menu.length())                                                        //  menu text
+         fprintf(fid,"menu %s \n",menus[me].menu.c_str());
 
-      if (menus[me].func)                                                        //  menu function (text)
-         fprintf(fid,"func %s \n",menus[me].func);
+      if (menus[me].func.length())                                                        //  menu function (text)
+         fprintf(fid,"func %s \n",menus[me].func.c_str());
 
       if (menus[me].pixbuf) {                                                    //  pixbuf image for menu icon
          pxbfile = zstrdup(menuconfigfile,20);
@@ -3708,7 +3709,7 @@ void gmenuznames::update_configfile()
          gerror = 0;
          gdk_pixbuf_save(menus[me].pixbuf,pxbfile,"png",&gerror,nullptr);           //  write pixbuf to file
          if (gerror)
-            printz("*** %s \n %s \n",menus[me].menu,gerror->message);
+            printz("*** %s \n %s \n",menus[me].menu.c_str(),gerror->message);
          else fprintf(fid,"icon %s \n",pxbfile);                                 //  pixbuf file name in menu file
          zfree(pxbfile);
       }
@@ -3771,9 +3772,12 @@ void gmenuznames::mouse_event(GtkWidget *, GdkEventButton *event, void *)
       if (elapsed < 500 && ! Fdrag) Fclick = 1;                                  //  mouse clicked
 
       if (me >= 0 && Fclick && Lmouse) {                                         //  menu entry was left-clicked
-         if (menus[me].func)
-            gmenuzcallback(menus[me].func);                                      //  caller user function(func)
-         if (menus[me].kill) quit();                                             //  close menu after app launch
+         if (menus[me].func.length()) {
+            gmenuzcallback(menus[me].func.c_str());                                      //  caller user function(func)
+		 }
+         if (menus[me].kill) {	 
+			quit();                                             //  close menu after app launch
+		 }
       }
 
       else if (Fclick && Rmouse)                                                 //  menu entry or empty space right-clicked
@@ -3899,16 +3903,16 @@ void gmenuznames::edit_menu()
       zdialog_run(zdedit,edit_menu_event);
    }
 
-   if (menus[me].menu)                                                           //  stuff menu text into dialog
-      zdialog_stuff(zdedit,"text",menus[me].menu);
+   if (menus[me].menu.length())                                                           //  stuff menu text into dialog
+      zdialog_stuff(zdedit,"text",menus[me].menu.c_str());
    else zdialog_stuff(zdedit,"text","");
 
-   if (menus[me].func)                                                           //  stuff menu function
-      zdialog_stuff(zdedit,"func",menus[me].func);
+   if (menus[me].func.length())                                                           //  stuff menu function
+      zdialog_stuff(zdedit,"func",menus[me].func.c_str());
    else zdialog_stuff(zdedit,"func","");
 
-   if (menus[me].icon)                                                           //  stuff icon file
-      zdialog_stuff(zdedit,"icon",menus[me].icon);
+   if (menus[me].icon.length())                                                           //  stuff icon file
+      zdialog_stuff(zdedit,"icon",menus[me].icon.c_str());
    else zdialog_stuff(zdedit,"icon","");
 
    if (menus[me].size)                                                           //  stuff icon size
@@ -3961,13 +3965,13 @@ int gmenuznames::edit_menu_event(zdialog *zd, cchar *event)
       }
                                                                                  //  [apply] - update menu from dialog data
       zdialog_fetch(zd,"text",text,maxText);
-      if (*text) menus[me].menu = zstrdup(text);                                 //  menu text, optional
-      else menus[me].menu = 0;
+      if (*text) menus[me].menu = text;                                 //  menu text, optional
+      else menus[me].menu = "";
 
       zdialog_fetch(zd,"func",text,maxText);                                     //  menu function name
       strTrim2(text);
-      if (*text) menus[me].func = zstrdup(text);
-      else menus[me].func = 0;
+      if (*text) menus[me].func = text;
+      else menus[me].func = "";
 
       zdialog_fetch(zd,"icon",text,maxText);                                     //  menu icon file, optional
       strTrim2(text);
@@ -3980,12 +3984,12 @@ int gmenuznames::edit_menu_event(zdialog *zd, cchar *event)
             zd->zstat = 0;                                                       //  keep dialog open
             return 0;                                                            //  do nothing
          }
-         menus[me].icon = zstrdup(text);
+         menus[me].icon = text;
          menus[me].pixbuf = pixbuf;
          menus[me].size = size;
       }
       else {
-         menus[me].icon = 0;
+         menus[me].icon = "";
          menus[me].pixbuf = 0;
          menus[me].size = 0;
       }
@@ -4080,7 +4084,7 @@ void gmenuznames::drag_drop_event(int mpx, int mpy, const char *file)           
          pixbuf = gdk_pixbuf_new_from_file_at_size(buff,32,32,&gerror);
          if (! pixbuf) zmessageACK(mWin,"icon file error: %s \n",buff);
          else {
-            menus[me].icon = zstrdup(buff);
+            menus[me].icon = buff;
             menus[me].pixbuf = pixbuf;
             menus[me].size = 32;
          }

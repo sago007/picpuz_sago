@@ -5202,7 +5202,9 @@ int zdialog_run(zdialog *zd, zdialog_event evfunc, cchar *posn)
 
    dialog = zd->widget[0].widget;
 
-   if (posn) zdialog_set_position(zd,posn);                                      //  put dialog at remembered position
+   if (posn)  {
+		zdialog_set_position(zd,posn);                                      //  put dialog at remembered position
+	}
 
    for (ii = 1; zd->widget[ii].type; ii++)                                       //  *** stop auto-selection
    {                                                                             //  (GTK "feature")
@@ -6775,7 +6777,7 @@ void zmessageACK(GtkWidget *parent, cchar *format, ... )
       return;
    }
 
-   zd = zdialog_new(0,parent,"OK",nullptr);
+   zd = zdialog_new("Message",parent,"OK",nullptr);
    zdialog_add_widget(zd,"hbox","hb1","dialog",0,"space=3");
    zdialog_add_widget(zd,"label","lab1","hb1",message,"space=5");
    zdialog_resize(zd,200,0);
@@ -6826,13 +6828,13 @@ int zmessageYN(GtkWidget *parent, cchar *format, ... )
    vsnprintf(message,400,format,arglist);
    va_end(arglist);
 
-   zd = zdialog_new("message",parent,ZTX("Yes"),ZTX("No"),nullptr);
+   zd = zdialog_new(ZTX("Confirm"),parent,ZTX("Yes"),ZTX("No"),nullptr);
    zdialog_add_widget(zd,"hbox","hb1","dialog",0,"space=3");
    zdialog_add_widget(zd,"label","lab1","hb1",message,"space=5");
    zdialog_resize(zd,200,0);
    zdialog_set_modal(zd);
    zdialog_set_decorated(zd,0);
-   zdialog_run(zd,0,"mouse");                                                    //  5.5
+   zdialog_run(zd,0,"parent");                                                    //  5.5
    zstat = zdialog_wait(zd);
    zdialog_free(zd);
    if (zstat == 1) return 1;

@@ -101,15 +101,13 @@ void load_imagedirk();                                                          
 
 int main(int argc, char *argv[])
 {
-   int         ii;
-   GtkWidget   *tbar;
    string        lang;
 
    gtk_init(&argc, &argv);                                                       //  GTK command line options
 
    zinitapp("picpuz");                                                           //  set up app directories
 
-   for (ii = 1; ii < argc; ii++)                                                 //  command line args
+   for (int ii = 1; ii < argc; ii++)                                                 //  command line args
    {
       if (strmatch(argv[ii],"-d"))                                               //  -d (debug flag)
             debug = 1;
@@ -133,7 +131,7 @@ int main(int argc, char *argv[])
    vbox1 = gtk_box_new(VERTICAL,0);                                              //  add vertical packing box
    gtk_container_add(GTK_CONTAINER(win1),vbox1);
 
-   tbar = create_toolbar(vbox1,32);                                              //  add toolbar and buttons
+   GtkWidget   *tbar = create_toolbar(vbox1,32);                                              //  add toolbar and buttons
    add_toolbar_button(tbar,ZTX("open"),ZTX("open new image file"),"open.png",menufunc);
    add_toolbar_button(tbar,ZTX("tile"),ZTX("set tile size"),"tile.png",menufunc);
    add_toolbar_button(tbar,ZTX("mix"),ZTX("randomize tiles"),"refresh.png",menufunc);
@@ -271,21 +269,19 @@ void drag_drop(int x, int y, const char *file)                                  
 
 void m_tile()
 {
-   zdialog     *zd;
-   int         zstat, nn;
-
    if (! Ntiles) return;
    if (puzzle_status()) return;                                                  //  do not discard
 
-   zd = zdialog_new(ZTX("change tile size"),win1,"OK",ZTX("cancel"),nullptr);
+   zdialog *zd = zdialog_new(ZTX("change tile size"),win1,"OK",ZTX("cancel"),nullptr);
    zdialog_add_widget(zd,"hbox","hb1","dialog",0,"space=10");
    zdialog_add_widget(zd,"label","lb1","hb1",ZTX("new tile size (pixels)"));
    zdialog_add_widget(zd,"spin","spin","hb1","20|200|1|80");
    zdialog_stuff(zd,"spin",tileU);
 
    zdialog_run(zd);
-   zstat = zdialog_wait(zd);
+   int zstat = zdialog_wait(zd);
 
+   int nn = 0;
    zdialog_fetch(zd,"spin",nn);
    zdialog_free(zd);
 
@@ -303,15 +299,13 @@ void m_tile()
 
 void m_mix()
 {
-   int      row1, col1, row2, col2;
-
    if (puzzle_status()) return;                                                  //  do not discard
 
-   for (row1 = 0; row1 < Nrows; row1++)                                          //  randomize tile positions
-   for (col1 = 0; col1 < Ncols; col1++)
+   for (int row1 = 0; row1 < Nrows; row1++)                                          //  randomize tile positions
+   for (int col1 = 0; col1 < Ncols; col1++)
    {
-      row2 = lrand(rseed,Nrows);
-      col2 = lrand(rseed,Ncols);
+      int row2 = lrand(rseed,Nrows);
+      int col2 = lrand(rseed,Ncols);
       swap_tiles(row1,col1,row2,col2);
       zsleep(0.01);
       zmainloop();
@@ -352,22 +346,19 @@ void m_show()
 
 void win2_paint(GtkWidget *, cairo_t *cr)
 {
-   PIXBUF      *refPixbuf;
-   int         x, y, winx, winy;
-
    if (! iPixbuf) return;
 
    gtk_window_set_title(GTK_WINDOW(win2),pname.c_str());
 
-   winx = gtk_widget_get_allocated_width(dwin2);                                 //  curr. window size
-   winy = gtk_widget_get_allocated_height(dwin2);
+   int winx = gtk_widget_get_allocated_width(dwin2);                                 //  curr. window size
+   int winy = gtk_widget_get_allocated_height(dwin2);
 
-   x = int(1.0 * winy * imageW / imageH);                                        //  preserve X/Y ratio
+   int x = int(1.0 * winy * imageW / imageH);                                        //  preserve X/Y ratio
    if (winx > x) winx = x;
-   y = int(1.0 * winx * imageH / imageW);
+   int y = int(1.0 * winx * imageH / imageW);
    if (winy > y) winy = y;
 
-   refPixbuf = gdk_pixbuf_scale_simple(iPixbuf,winx,winy,interp);                //  scale image to window
+   PIXBUF *refPixbuf = gdk_pixbuf_scale_simple(iPixbuf,winx,winy,interp);                //  scale image to window
    gdk_cairo_set_source_pixbuf(cr,refPixbuf,0,0);                                //  gtk3
    cairo_paint(cr);
    g_object_unref(refPixbuf);
@@ -829,13 +820,12 @@ void swap2(int row1, int col1, int row2, int col2)
 
 void swap3(int row1, int col1, int row2, int col2)
 {
-   int      ii1, iix, iiy, jj, kk, drow, dcol, change;
-   int      Nstack, Estack;
+   int      iiy, jj, kk, drow, dcol, change;
    int      adjrow[4] = { -1, 0, 0, +1 };
    int      adjcol[4] = { 0, -1, +1, 0 };
-   int      rowx, colx, rowy, coly, rowz, colz;
+   int      rowy, coly, rowz, colz;
 
-   ii1 = Tindex(row1,col1);
+   int ii1 = Tindex(row1,col1);
    if (hposn[ii1].row != row1 || hposn[ii1].col != col1)                         //  if tile1 not at home,
       return;                                                                    //    nothing to do
 
@@ -847,8 +837,8 @@ void swap3(int row1, int col1, int row2, int col2)
 
    Rstack[0] = row1;
    Cstack[0] = col1;
-   Nstack = 1;
-   Estack = 0;
+   int Nstack = 1;
+   int Estack = 0;
 
    while (Estack < Nstack)
    {
@@ -858,8 +848,8 @@ void swap3(int row1, int col1, int row2, int col2)
 
       for (jj = 0; jj < 4; jj++)
       {
-         rowx = row1 + adjrow[jj];                                               //  tilex is adjoining a tile
-         colx = col1 + adjcol[jj];                                               //    that was moved to home
+         int rowx = row1 + adjrow[jj];                                               //  tilex is adjoining a tile
+         int colx = col1 + adjcol[jj];                                               //    that was moved to home
          if (rowx < 0 || colx < 0) continue;                                     //  skip if out of bounds
          if (rowx == Nrows || colx == Ncols) continue;
 
@@ -890,10 +880,10 @@ void swap3(int row1, int col1, int row2, int col2)
       Estack = 0;
       while (Estack < Nstack)
       {
-         rowx = Rstack[Estack];                                                  //  next tile position from stack,
-         colx = Cstack[Estack];                                                  //    to be filled with home tile
+         int rowx = Rstack[Estack];                                                  //  next tile position from stack,
+         int colx = Cstack[Estack];                                                  //    to be filled with home tile
          Estack++;
-         iix = Tindex(rowx,colx);
+         int iix = Tindex(rowx,colx);
          rowz = hposn[iix].row;                                                  //  home position of tile
          colz = hposn[iix].col;
          if (rowz != rowx || colz != colx) {                                     //  if not already home

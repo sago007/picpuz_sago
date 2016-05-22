@@ -224,7 +224,6 @@ static PIXBUF * get_thumbnail(cchar *fpath, int size);                          
    wscanf                  read text from edit window, line at a time
    wfiledump               dump text window to a file
    wfilesave               wfiledump with save-as dialog
-   wprintp                 print text window to default printer
    textwidget funcs        intercept mouse clicks on text windows, get clicked text
    menus / toolbars        simplified GTK menus, toolbars and status bars
    popup menus             create popup menus
@@ -1779,87 +1778,6 @@ double drandz(int64 *seed)                                                      
 
 /**************************************************************************
 
-   spline1: define a curve using a set of data points (x and y values)
-   spline2: for a given x-value, return a y-value fitting the curve
-
-   For spline1, the no. of curve-defining points must be < 100.
-   For spline2, the given x-value must be within the range defined in spline1.
-
-   The algorithm was taken from the book "Numerical Recipes"
-   (Cambridge University Press) and converted from Fortran to C++.
-
-***/
-
-namespace splinedata
-{
-   int      nn;
-   float    px1[100], py1[100], py2[100];
-}
-
-
-void spline1(int dnn, float *dx1, float *dy1)
-{
-   using namespace splinedata;
-
-   float    sig, p, u[100];
-   int      ii;
-
-   nn = dnn;
-   if (nn > 100) zappcrash("spline1(), > 100 data points");
-
-   for (ii = 0; ii < nn; ii++)
-   {
-      px1[ii] = dx1[ii];
-      py1[ii] = dy1[ii];
-      if (ii && px1[ii] <= px1[ii-1])
-         zappcrash("spline1(), x-value not increasing");
-   }
-
-   py2[0] = u[0] = 0;
-
-   for (ii = 1; ii < nn-1; ii++)
-   {
-      sig = (px1[ii] - px1[ii-1]) / (px1[ii+1] - px1[ii-1]);
-      p = sig * py2[ii-1] + 2;
-      py2[ii] = (sig - 1) / p;
-      u[ii] = (6 * ((py1[ii+1] - py1[ii]) / (px1[ii+1] - px1[ii]) - (py1[ii] - py1[ii-1])
-            / (px1[ii] - px1[ii-1])) / (px1[ii+1] - px1[ii-1]) - sig * u[ii-1]) / p;
-   }
-
-   py2[nn-1] = 0;
-
-   for (ii = nn-2; ii >= 0; ii--)
-      py2[ii] = py2[ii] * py2[ii+1] + u[ii];
-
-   return;
-}
-
-
-float  spline2(float x)
-{
-   using namespace splinedata;
-
-   int      kk, klo = 0, khi = nn-1;
-   float    h, a, b, y;
-
-   while (khi - klo > 1)
-   {
-      kk = (khi + klo) / 2;
-      if (px1[kk] > x) khi = kk;
-      else klo = kk;
-   }
-
-   h = px1[khi] - px1[klo];
-   a = (px1[khi] - x) / h;
-   b = (x - px1[klo]) / h;
-   y = a * py1[klo] + b * py1[khi] + ((a*a*a - a) * py2[klo]
-                                   + (b*b*b - b) * py2[khi]) * (h*h) / 6;
-
-   return y;
-}
-
-/**************************************************************************
-
    Initialize application files according to following conventions:              //  new version
      + binary executable is at:  /prefix/bin/appname                             //  = PREFIX/bin/appname
      + other application directories are derived as follows:
@@ -2888,7 +2806,7 @@ char * wscanf(GtkWidget *mLog, int & ftf)
 //  dump text window into file
 //  return:  0: OK  +N: error
 
-int   wfiledump_maxcc = 0;
+static int   wfiledump_maxcc = 0;
 
 int wfiledump(GtkWidget *mLog, const char *filespec)
 {
@@ -2940,36 +2858,6 @@ void wfilesave(GtkWidget *mLog, GtkWindow *parent)
    if (file.empty()) return;
    err = wfiledump(mLog,file.c_str());
    if (err) zmessageACK(0,"save screen failed (%d)",err);
-   return;
-}
-
-
-/**************************************************************************/
-
-//  print text window to default printer
-//  use landscape mode if max. print line > A4 width
-
-void wprintp(GtkWidget *mLog)
-{
-   int            err;
-   char           printfile[30];
-   static int64   seed = 0;
-   static int     pid;
-
-   if (! seed) seed = pid = getpid();
-   if (! mLog) return;
-   snprintf(printfile,30,"/tmp/wprintp-%d-%d",pid,lrandz(&seed));
-   err = wfiledump(mLog,printfile);
-   if (err) return;
-
-   if (wfiledump_maxcc < 97)
-      err = shell_ack("lp -o %s -o %s -o %s -o %s -o %s -o %s %s",
-                      "cpi=14","lpi=8","page-left=50","page-top=50",
-                      "page-right=40","page-bottom=40",printfile);
-   else
-      err = shell_ack("lp -o %s -o %s -o %s -o %s -o %s -o %s -o %s %s",
-                      "landscape","cpi=14","lpi=8","page-left=50","page-top=50",
-                      "page-right=40","page-bottom=40",printfile);
    return;
 }
 

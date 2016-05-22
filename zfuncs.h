@@ -114,10 +114,6 @@ struct  pvlist {
 int lrandz(int64 * seed);                                                        //  returns 0 to 0x7fffffff
 double drandz(int64 * seed);                                                     //  returns 0.0 to 0.99999...
 
-//  spline curve-fitting functions ========================================
-
-void spline1(int nn, float *dx, float *dy);                                      //  define a curve using nn data points
-float spline2(float x);                                                          //  return y-value for given x-value
 
 //  application initialization and administration =========================
 
@@ -167,7 +163,6 @@ void wclear(GtkWidget *Win, int line);                                          
 char * wscanf(GtkWidget *Win, int &ftf);                                         //  get text lines from edit widget
 int  wfiledump(GtkWidget *Win, const char *filespec);                                  //  dump text window to file
 void wfilesave(GtkWidget *Win, GtkWindow *parent);                               //  wfiledump() via file-chooser dialog
-void wprintp(GtkWidget *Win);                                                    //  print text window to default printer
 
 //  intercept text window mouse click functions
 

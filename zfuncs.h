@@ -322,7 +322,6 @@ void zmessageACK(GtkWidget *parent, cchar *format, ... );                       
 void zmessLogACK(GtkWidget *parent, cchar *format, ... );                           //  same, with log to STDOUT
 int  zmessageYN(GtkWidget *parent, cchar *format, ... );                            //  display message, wait for YES/NO
 zdialog * zmessage_post(GtkWidget *parent, int secs, cchar *format, ...);           //  show message, timeout or cancel
-char * zdialog_text(GtkWidget *parent, cchar *title, cchar *inittext);              //  get short text input from user
 int  zdialog_choose(GtkWidget *parent, cchar *message, ...);                        //  show message, return choice
 void poptext_mouse(cchar *text, int dx, int dy, float s1, float s2);                //  show popup text at mouse posn
 void poptext_window(cchar *text, GtkWindow *, int mx, int my, float s1, float s2);  //  show popup text at window posn

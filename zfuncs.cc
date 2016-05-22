@@ -40,7 +40,7 @@ static void zappcrash(cchar *format, ...);                                      
 
 static int shell_quiet(cchar *command, ...);                                            //  format/run shell command, return status
 
-static char * command_output(int &contx, cchar *command, ...);                          //  get shell command output
+static std::string command_output(int &contx, cchar *command, ...);                          //  get shell command output
 static int command_status(int contx);                                                   //  get exit status of command
 
 
@@ -715,8 +715,9 @@ void * shell_asynch_thread(void *arg)                                           
 FILE *   CO_contx[10] = { 0,0,0,0,0,0,0,0,0,0 };
 int      CO_status[10];
 
-char * command_output(int &contx, cchar *command, ...)                           //  simplify, allow parallel usage
+std::string command_output(int &contx, cchar *command, ...)                           //  simplify, allow parallel usage
 {
+	std::string ret;
    FILE        *fid;
    va_list     arglist;
    char        buff[10000], *prec;
@@ -727,7 +728,7 @@ char * command_output(int &contx, cchar *command, ...)                          
          if (CO_contx[contx] == 0) break;
       if (contx == 10) {
          printz("*** command_output(), parallel usage > 9 \n");
-         return 0;
+         return ret;
       }
       va_start(arglist,command);                                                 //  format command
       vsnprintf(buff,9999,command,arglist);
@@ -737,7 +738,7 @@ char * command_output(int &contx, cchar *command, ...)                          
       if (fid == 0) {
          CO_status[contx] = errno;                                               //  failed to start
          printz("*** command_output: %s\n %s\n",buff,strerror(errno));
-         return 0;
+         return ret;
       }
       CO_contx[contx] = fid + 1000;
       CO_status[contx] = -1;                                                     //  mark context busy
@@ -745,10 +746,13 @@ char * command_output(int &contx, cchar *command, ...)                          
 
    fid = CO_contx[contx] - 1000;
    prec = fgets_trim(buff,9999,fid,1);                                           //  next output, less trailing \n
-   if (prec) return zstrdup(prec);
+   if (prec) {
+	   ret = prec;
+	   return ret;
+   }
    CO_status[contx] = pclose(fid);                                               //  EOF, set status
    CO_contx[contx] = 0;                                                          //  mark context free
-   return 0;
+   return ret;
 }
 
 int command_status(int contx)                                                    //  get command exit status
@@ -6730,15 +6734,17 @@ int popup_text_timeout(GtkWidget **mWin)
 
 int popup_command(cchar *command, int ww, int hh, GtkWidget *parent, int top)
 {
-   char        *buff;
    int         err, contx = 0;
 
    write_popup_text("open",command,ww,hh,parent);                                //  bugfix
 
-   while ((buff = command_output(contx,command)))
+   while (true)
    {
-      write_popup_text("write",buff);
-      zfree(buff);
+	   std::string s = command_output(contx,command);
+	   if (s.length() == 0) {
+		   break;
+	   }
+      write_popup_text("write",s.c_str());
    }
 
    if (top) write_popup_text("top",0);                                           //  back to top of window     6.0
@@ -6881,38 +6887,6 @@ int zmessage_post_event(zdialog *zd, cchar *event)
    return 0;
 }
 
-
-/**************************************************************************/
-
-//  get text input from a popup dialog
-//  returned text is subject for zfree()
-//  null is returned if user presses [cancel] button.
-
-char * zdialog_text(GtkWidget *parent, cchar *title, cchar *inittext)
-{
-   zdialog     *zd;
-   int         zstat;
-   char        *text;
-
-   zthreadcrash();                                                               //  thread usage not allowed
-
-   zd = zdialog_new(title,parent,"OK",ZTX("cancel"),nullptr);
-   if (! title) zdialog_set_decorated(zd,0);                                     //  6.1
-   zdialog_add_widget(zd,"frame","fred","dialog");
-   zdialog_add_widget(zd,"edit","edit","fred");
-   if (inittext) zdialog_stuff(zd,"edit",inittext);
-
-   zdialog_resize(zd,200,0);
-   zdialog_set_modal(zd);
-   zdialog_run(zd,0,"mouse");                                                    //  5.5
-   zstat = zdialog_wait(zd);
-   if (zstat == 1)
-      text = (char *) zdialog_get_data(zd,"edit");
-   else text = 0;
-   if (text) text = zstrdup(text);
-   zdialog_free(zd);
-   return text;
-}
 
 
 /**************************************************************************/

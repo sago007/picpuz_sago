@@ -599,18 +599,16 @@ int shell_quiet(cchar *command, ...)                                            
    va_end(arglist);
 
    err = system(cbuff);
-   if (! err) { zfree(cbuff); return 0; }
-
-   err = WEXITSTATUS(err);                                                       //  special BS for subprocesses     5.8
+   if (! err) { 
+	   zfree(cbuff); 
+	   return 0; 
+   }
 
    if (strmatchN(command,"diff",4)) { zfree(cbuff); return err; }                //  no diagnostic for these
    if (strmatchN(command,"cmp",3)) { zfree(cbuff); return err; }
    if (strmatchN(command,"which",5)) { zfree(cbuff); return err; }
 
-   if (cc > 200) cbuff[200] = 0;
-   if (err == 127)                                                               //  special case                    5.8
-      printz("%s *** %s \n",cbuff,"command not found");
-   else printz("%s *** %s \n",cbuff,strerror(err));                              //  log error message
+   printz("%s *** %s \n",cbuff,strerror(err));                              //  log error message
 
    zfree(cbuff);
    return err;
@@ -638,23 +636,18 @@ int shell_ack(cchar *command, ...)                                              
 
    printz("shell: %s \n",cbuff);                                                 //  5.6
    err = system(cbuff);
-   if (! err) { zfree(cbuff); return 0; }
-
-   err = WEXITSTATUS(err);                                                       //  special BS for subprocesses     5.8
+   if (! err) { 
+	   zfree(cbuff); 
+	   return 0; 
+   }
 
    if (strmatchN(command,"diff",4)) { zfree(cbuff); return err; }                //  no diagnostic for these
    if (strmatchN(command,"cmp",3)) { zfree(cbuff); return err; }
    if (strmatchN(command,"which",5)) { zfree(cbuff); return err; }
 
-   if (cc > 200) cbuff[200] = 0;
-   if (err == 127) {
-      printz("%s *** %s \n",cbuff,"command not found");                          //  special case                    5.8
-      zmessageACK(0,"%s \n %s",cbuff,"command not found");
-   }
-   else {
-      printz("%s *** %s \n",cbuff,wstrerror(err));                               //  log error message
-      zmessageACK(0,"%s \n %s",cbuff,wstrerror(err));                            //  popup error message
-   }
+   
+	printz("%s *** %s \n",cbuff,wstrerror(err));                               //  log error message
+	zmessageACK(0,"%s \n %s",cbuff,wstrerror(err));                            //  popup error message
 
    zfree(cbuff);
    return err;
@@ -699,10 +692,7 @@ void * shell_asynch_thread(void *arg)                                           
       return 0;
    }
 
-   err = WEXITSTATUS(err);                                                       //  special BS for subprocesses     5.8
-   if (err == 127)
-      printz("%s \n *** %s \n",command[ii],"command not found");                 //  special case                    5.8
-   else printz("%s \n *** %s \n",command[ii],wstrerror(err));                    //  log error message
+   printz("%s \n *** %s \n",command[ii],wstrerror(err));                    //  log error message
    status[ii] = err;                                                             //  set status for caller
    return 0;
 }
@@ -765,7 +755,7 @@ char * command_output(int &contx, cchar *command, ...)                          
 int command_status(int contx)                                                    //  get command exit status
 {
    int err = CO_status[contx];
-   return WEXITSTATUS(err);                                                      //  special BS for subprocess
+   return err;                                                     
 }
 
 

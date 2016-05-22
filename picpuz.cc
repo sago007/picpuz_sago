@@ -774,27 +774,23 @@ void swap_tiles(int row1, int col1, int row2, int col2)
 
 void swap2(int row1, int col1, int row2, int col2)
 {
-   #define  SWAP(x,y) { temp = (x); (x) = (y); (y) = temp; }
-
-   int      ii1, ii2, temp;
-
    if (! Ntiles) return;
    if (row1 == row2 && col1 == col2) return;
 
-   ii1 = Tindex(row1,col1);                                                      //  count tiles moved from home
-   ii2 = Tindex(row2,col2);
+   int ii1 = Tindex(row1,col1);                                                      //  count tiles moved from home
+   int ii2 = Tindex(row2,col2);
    if (hposn[ii1].row == row1 && hposn[ii1].col == col1) Nhome--;
    if (hposn[ii2].row == row2 && hposn[ii2].col == col2) Nhome--;
 
    ii1 = Tindex(row1,col1);                                                      //  swap home positions for window tiles
    ii2 = Tindex(row2,col2);                                                      //    at (row1,col1) and (row2,col2)
-   SWAP(hposn[ii1].row,hposn[ii2].row)
-   SWAP(hposn[ii1].col,hposn[ii2].col)
+   std::swap(hposn[ii1].row,hposn[ii2].row);
+   std::swap(hposn[ii1].col,hposn[ii2].col);
 
    ii1 = Tindex(hposn[ii1].row,hposn[ii1].col);                                  //  swap window positions for home tiles
    ii2 = Tindex(hposn[ii2].row,hposn[ii2].col);                                  //    of these window positions
-   SWAP(wposn[ii1].row,wposn[ii2].row)
-   SWAP(wposn[ii1].col,wposn[ii2].col)
+   std::swap(wposn[ii1].row,wposn[ii2].row);
+   std::swap(wposn[ii1].col,wposn[ii2].col);
 
    mwcr = gdk_cairo_create(gtk_widget_get_window(dwin1));                        //  gtk3
    cairo_set_line_width(mwcr,1);

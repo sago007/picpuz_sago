@@ -377,9 +377,7 @@ void win2_destroy()
 
 void m_save()
 {
-   FILE           *fid;
    std::string    sfile;
-   int            ii, row, col;
    string           savefile;                                                //  saved puzzle file name
 
    if (! Ntiles) return;
@@ -389,7 +387,7 @@ void m_save()
    sfile = zgetfile(ZTX("save puzzle to a file"),MWIN,"save",savefile.c_str());
    if (sfile.empty()) return;
 
-   fid = fopen(sfile.c_str(), "w");
+   FILE* fid = fopen(sfile.c_str(), "w");
    if (! fid) {
       zmessageACK(win1,ZTX("cannot open: %s"),sfile.c_str());
       return;
@@ -399,9 +397,9 @@ void m_save()
    fprintf(fid," %d %d \n",Ntiles,Nhome);                                        //  save tile count and no. home
    fprintf(fid," %d %d \n",Nrows,Ncols);                                         //  save row and col counts
 
-   for (row = 0; row < Nrows; row++) {                                           //  save tile position data
-      for (col = 0; col < Ncols; col++) {
-         ii = Tindex(row,col);
+   for (int row = 0; row < Nrows; row++) {                                           //  save tile position data
+      for (int col = 0; col < Ncols; col++) {
+         int ii = Tindex(row,col);
          fprintf(fid," %d,%d ",wposn[ii].row, wposn[ii].col);
       }
       fprintf(fid,"\n");
@@ -419,7 +417,7 @@ void m_save()
 void m_resume()
 {
    FILE        *fid;
-   int         stat, row1, col1, row2, col2, ii;
+   int         row2, col2;
    string      newfile;
 
    if (puzzle_status()) return;                                                  //  do not discard
@@ -436,37 +434,39 @@ void m_resume()
 
    newfile.resize(XFCC);
    const char* pp = fgets_trim(&newfile[0],newfile.length(), fid, 1);                                        //  read image file name
-   if (! pp) goto badfile;
-
-   imagefile = newfile;
-
-   stat = fscanf(fid," %d %d ",&Ntiles,&Nhome);
-   if (stat != 2) goto badfile;
-
-   stat = fscanf(fid," %d %d ",&Nrows,&Ncols);                                   //  read row and col counts
-   if (stat != 2) goto badfile;
-   if (Ntiles != Nrows * Ncols) goto badfile;
-
-   wposn.clear();
-   wposn.resize(Ntiles);
-
-   for (row1 = 0; row1 < Nrows; row1++) {                                        //  read tile position data
-      for (col1 = 0; col1 < Ncols; col1++) {
-         stat = fscanf(fid," %d,%d ",&row2,&col2);
-         if (stat != 2) goto badfile;
-         if (row2 < 0 || row2 >= Nrows) goto badfile;
-         if (col2 < 0 || col2 >= Ncols) goto badfile;
-         ii = Tindex(row1,col1);
-         wposn[ii].row = row2;
-         wposn[ii].col = col2;
-      }
+   if (! pp) {
+	   goto badfile;
    }
+   else {
+		imagefile = newfile;
 
-   fclose(fid);
+		int stat = fscanf(fid," %d %d ",&Ntiles,&Nhome);
+		if (stat != 2) goto badfile;
 
-   init_puzzle(0);                                                               //  initialize, preserve tile data
-   return;
+		stat = fscanf(fid," %d %d ",&Nrows,&Ncols);                                   //  read row and col counts
+		if (stat != 2) goto badfile;
+		if (Ntiles != Nrows * Ncols) goto badfile;
 
+		wposn.clear();
+		wposn.resize(Ntiles);
+
+		for (int row1 = 0; row1 < Nrows; row1++) {                                        //  read tile position data
+		   for (int col1 = 0; col1 < Ncols; col1++) {
+			  stat = fscanf(fid," %d,%d ",&row2,&col2);
+			  if (stat != 2) goto badfile;
+			  if (row2 < 0 || row2 >= Nrows) goto badfile;
+			  if (col2 < 0 || col2 >= Ncols) goto badfile;
+			  int ii = Tindex(row1,col1);
+			  wposn[ii].row = row2;
+			  wposn[ii].col = col2;
+		   }
+		}
+
+		fclose(fid);
+
+		init_puzzle(0);                                                               //  initialize, preserve tile data
+		return;
+   }
 badfile:
    fclose(fid);
    zmessageACK(win1,ZTX("saved puzzle file is not valid"));
@@ -479,19 +479,18 @@ badfile:
 
 void m_doN(int nn1)
 {
-   int      row1, col1, row2, col2, ii, nn2;
-
    if (! Ntiles) return;
 
    while (true)
    {
-      row1 = lrand(rseed,Nrows);                                                 //  random starting tile
-      col1 = lrand(rseed,Ncols);
-      nn2 = Ntiles;
+      int row1 = lrand(rseed,Nrows);                                                 //  random starting tile
+      int col1 = lrand(rseed,Ncols);
+		int row2, col2;
+      int nn2 = Ntiles;
 
       while (true)                                                               //  scan for tile to move
       {
-         ii = Tindex(row1,col1);
+         int ii = Tindex(row1,col1);
          row2 = wposn[ii].row;                                                   //  curr. position
          col2 = wposn[ii].col;
          if (row1 != row2 || col1 != col2) break;                                //  not at home position
@@ -576,16 +575,14 @@ void m_help()                                                                   
 
 void init_puzzle(int newp)
 {
-   GError      *gerror = 0;
-   const char        *pp;
-
    if (imagefile.length() == 0) return;
 
-   pp = strrchr(imagefile.c_str(),'/');                                         //  puzzle name = image file name
+   const char* pp = strrchr(imagefile.c_str(),'/');                                         //  puzzle name = image file name
    if (! pp++) pp = imagefile.c_str();
    pname = pp;
 
    if (iPixbuf) g_object_unref(iPixbuf);
+   GError      *gerror = nullptr;
    iPixbuf = gdk_pixbuf_new_from_file(imagefile.c_str(),&gerror);                        //  create pixbuf from image file
    if (!iPixbuf) {
       zmessageACK(win1,ZTX("image type not recognized:\n %s"),imagefile.c_str());
@@ -625,8 +622,6 @@ void clear_puzzle()
 
 void tile_window(int newp)
 {
-   int         x1, y1, ii, row, col;
-
    if (! iPixbuf) return;
 
    winW = gtk_widget_get_allocated_width(dwin1);                                 //  window size
@@ -635,9 +630,9 @@ void tile_window(int newp)
    winW = winW - 4;                                                              //  to keep margins visible
    winH = winH - 4;
 
-   x1 = int(1.0 * winH * imageW / imageH);                                       //  preserve image X/Y ratio
+   int x1 = int(1.0 * winH * imageW / imageH);                                       //  preserve image X/Y ratio
    if (winW > x1) winW = x1;
-   y1 = int(1.0 * winW * imageH / imageW);
+   int y1 = int(1.0 * winW * imageH / imageW);
    if (winH > y1) winH = y1;
 
    if (newp)                                                                     //  new puzzle
@@ -650,10 +645,10 @@ void tile_window(int newp)
 	  wposn.clear();
 	  wposn.resize(Ntiles);
 
-      for (row = 0; row < Nrows; row++) {
-		for (col = 0; col < Ncols; col++)
+      for (int row = 0; row < Nrows; row++) {
+		for (int col = 0; col < Ncols; col++)
 		{
-		   ii = Tindex(row,col);                                                   //  all window positions = home
+		   int ii = Tindex(row,col);                                                   //  all window positions = home
 		   wposn[ii].row = row;
 		   wposn[ii].col = col;
 		}
@@ -663,10 +658,10 @@ void tile_window(int newp)
    hposn.clear();
    hposn.resize(Ntiles);
 
-   for (row = 0; row < Nrows; row++)                                             //  initialize home position map
-   for (col = 0; col < Ncols; col++)                                             //    from window position map
+   for (int row = 0; row < Nrows; row++)                                             //  initialize home position map
+   for (int col = 0; col < Ncols; col++)                                             //    from window position map
    {
-      ii = Tindex(row,col);
+      int ii = Tindex(row,col);
       ii = Tindex(wposn[ii].row,wposn[ii].col);
       hposn[ii].row = row;
       hposn[ii].col = col;
@@ -682,8 +677,8 @@ void tile_window(int newp)
    wPixbuf = gdk_pixbuf_scale_simple(iPixbuf,winW,winH,interp);                  //  scale image to window size
 
    if (mwcr) {
-      for (row = 0; row < Nrows; row++) {                                          //  draw tile pixmaps on window
-		for (col = 0; col < Ncols; col++) {
+      for (int row = 0; row < Nrows; row++) {                                          //  draw tile pixmaps on window
+		for (int col = 0; col < Ncols; col++) {
 		   draw_tile(row,col);
 		}
 	  }
@@ -691,8 +686,8 @@ void tile_window(int newp)
    else {
       mwcr = gdk_cairo_create(gtk_widget_get_window(dwin1));                     //  gtk3
       cairo_set_line_width(mwcr,1);
-      for (row = 0; row < Nrows; row++) {
-		for (col = 0; col < Ncols; col++) {
+      for (int row = 0; row < Nrows; row++) {
+		for (int col = 0; col < Ncols; col++) {
 		   draw_tile(row,col);
 		}
 	  }
@@ -711,13 +706,12 @@ void tile_window(int newp)
 void mouse_event(GtkWidget *, GdkEventButton *event)
 {
    static int  row1, col1, row2, col2;
-   int         button, ii, x, y;
 
    if (! Ntiles) return;
 
-   button = event->button;                                                       //  1/2/3 = left/middle/right
-   x = int(event->x);
-   y = int(event->y);
+   int button = event->button;                                                       //  1/2/3 = left/middle/right
+   int x = int(event->x);
+   int y = int(event->y);
 
    if (x < 1 || x >= (Ncols * tileW)) goto mret0;                                //  ignore if not within picture
    if (y < 1 || y >= (Nrows * tileH)) goto mret0;
@@ -725,7 +719,7 @@ void mouse_event(GtkWidget *, GdkEventButton *event)
    if (button == 3) {                                                            //  if right button,
       row1 = y / tileH;                                                          //    get tile belonging here
       col1 = x / tileW;
-      ii = Tindex(row1,col1);
+      int ii = Tindex(row1,col1);
       row2 = wposn[ii].row;                                                      //  where it is now
       col2 = wposn[ii].col;
       swap_tiles(row1,col1,row2,col2);                                           //  swap
